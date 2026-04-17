@@ -28,14 +28,14 @@ export const servicesMenu: ServiceItem[] = [
   category: "coloracao",
   name: "Coloração completa",
   desc: "Aplicação uniforme com produtos profissionais. Ideal para mudança total de tom.",
-  priceFrom: "desde 45€",
+  priceFrom: "desde 35€",
 },
 {
   id: "col2",
   category: "coloracao",
   name: "Balayage",
   desc: "Técnica de iluminação natural, personalizada conforme o teu cabelo.",
-  priceFrom: "desde 120€",
+  priceFrom: "desde 80€",
   badge: "Tendência",
 },
 {
@@ -43,7 +43,7 @@ export const servicesMenu: ServiceItem[] = [
   category: "coloracao",
   name: "Madeixas",
   desc: "Clareamento localizado para dar luz e profundidade ao cabelo.",
-  priceFrom: "desde 90€",
+  priceFrom: "desde 70€",
 },
 
   {
@@ -57,23 +57,16 @@ export const servicesMenu: ServiceItem[] = [
   {
     id: "t2",
     category: "penteados",
-    name: "Knotless Braids",
-    desc: "Mais leve na raiz e com resultado natural. Ideal para quem quer conforto.",
-    priceFrom: "desde 110€",
+    name: "Penteados com Referência",
+    desc: "Penteados inspirados em fotos ou ocasiões específicas. Consulta prévia para avaliação.",
+    priceFrom: "desde 50€",
   },
   {
     id: "t3",
     category: "penteados",
-    name: "Twists",
-    desc: "Opção versátil e elegante com excelente durabilidade.",
-    priceFrom: "desde 75€",
-  },
-  {
-    id: "t4",
-    category: "penteados",
-    name: "Cornrows (nagô)",
-    desc: "Riscas precisas e design personalizado (simples a elaborado).",
-    priceFrom: "desde 35€",
+    name: "Penteado Noiva",
+    desc: "Penteado elaborado para noivas, com acabamento perfeito e duradouro.",
+    priceFrom: "desde 70€",
   },
 
   {
@@ -81,14 +74,14 @@ export const servicesMenu: ServiceItem[] = [
     category: "cabelo",
     name: "Lavagem + hidratação",
     desc: "Tratamento para brilho e maciez. Ideal antes de penteados/tranças.",
-    priceFrom: "desde 20€",
+    priceFrom: "desde 30€",
   },
   {
     id: "c2",
     category: "cabelo",
     name: "Escova + finalização",
     desc: "Escova com acabamento polido e duradouro.",
-    priceFrom: "desde 18€",
+    priceFrom: "desde 15€",
   },
   {
     id: "c3",
@@ -96,6 +89,30 @@ export const servicesMenu: ServiceItem[] = [
     name: "Corte (feminino)",
     desc: "Corte pensado para o teu formato de rosto e rotina.",
     priceFrom: "desde 15€",
+  },
+
+    {
+    id: "c4",
+    category: "cabelo",
+    name: "Corte (masculino/infantil)",
+    desc: "Corte pensado para o teu formato de rosto e rotina.",
+    priceFrom: "desde 12€",
+  },
+
+    {
+    id: "c5",
+    category: "cabelo",
+    name: "Progressiva",
+    desc: "Tratamento para alisar o cabelo e dar-lhe volume.",
+    priceFrom: "desde 90€",
+  },
+
+    {
+    id: "c6",
+    category: "cabelo",
+    name: "Relaxamento capilar",
+    desc: "Tratamento para alisar o cabelo e reduzir o volume, ideal para cabelos crespos ou muito volumosos.",
+    priceFrom: "desde 60€",
   },
 
   {
@@ -107,4 +124,3 @@ export const servicesMenu: ServiceItem[] = [
     badge: "Lisboa",
   },
 ];
-

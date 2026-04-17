@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { site } from "@/content/site";
+import { site } from "@/content/Site";
 
 export function FloatingCTA() {
   const [visible, setVisible] = useState(false);

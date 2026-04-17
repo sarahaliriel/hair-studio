@@ -1,4 +1,4 @@
-import { site } from "@/content/site";
+import { site } from "@/content/Site";
 
 export function Footer() {
   const waText = encodeURIComponent(
@@ -73,9 +73,22 @@ export function Footer() {
             <p className="text-[12px] text-[#2f2d2d]/60">
               © {new Date().getFullYear()} {site.name}. Todos os direitos reservados.
             </p>
-            <p className="text-[12px] text-[#875f46]">
-              Lisboa • <span className="text-[#5b5545]">Feito por Sarah Aliriel</span>
-            </p>
+              <div className="flex items-center gap-3 text-(--accent)">
+                <a
+                  href="https://sarahaliriel.tech"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Portfólio"
+                  className="group inline-flex items-center gap-3"
+                >
+                  <span className="font-mono text-sm tracking-[0.25em] opacity-60 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+                    &lt;/s/a&gt;
+                  </span>
+                  <span className="text-[11px] tracking-[0.22em] uppercase opacity-0 transition-opacity duration-300 group-hover:opacity-80 group-focus-visible:opacity-80">
+                    Sarah Aliriel
+                  </span>
+                </a>
+              </div>
           </div>
         </div>
       </div>

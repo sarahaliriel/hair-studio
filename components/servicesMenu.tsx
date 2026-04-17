@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { serviceCategories, servicesMenu, type ServiceCategoryKey } from "@/content/servicesMenu";
-import { site } from "@/content/site";
+import { serviceCategories, servicesMenu, type ServiceCategoryKey } from "@/content/ServicesMenu";
+import { site } from "@/content/Site";
 
 function normalize(s: string) {
   return s
@@ -14,7 +14,7 @@ function normalize(s: string) {
 
 function waLink(serviceName: string) {
   const text = encodeURIComponent(
-    `Olá! Gostava de marcar um atendimento. 😊\n\nServiço: ${serviceName}\nData/horário preferidos: \nLocal: Salão / Domicílio\n\nNome: `
+    `Olá! Gostava de marcar um atendimento! 😊\n\nServiço: ${serviceName}\nData/horário preferidos: \nLocal: Salão / Domicílio\n\nNome: `
   );
   return `https://wa.me/${site.whatsappRaw}?text=${text}`;
 }

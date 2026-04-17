@@ -1,4 +1,4 @@
-import { pricing, pricingNote } from "@/content/pricing";
+import { pricing, pricingNote } from "@/content/Pricing";
 
 export function PricingTable() {
   return (

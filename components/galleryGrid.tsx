@@ -13,14 +13,18 @@ type GalleryItem = {
 };
 
 const ITEMS: GalleryItem[] = [
-  { id: "g1", src: "/images/galeria/01.png", alt: "Corte e hidratação", tag: "Corte", note: "Corte completo com acabamento polido" },
+  { id: "g1", src: "/images/galeria/001.png", alt: "Corte completo com acabamento polido e coloração", tag: "Corte", note: "Corte, coloração e hidratação" },
   { id: "g2", src: "/images/galeria/02.png", alt: "Penteado preso elegante", tag: "Penteados", note: "Evento" },
-  { id: "g3", src: "/images/galeria/03.png", alt: "Corte em camadas e alisamento", tag: "Corte", note: "Luz e dimensão" },
-  { id: "g4", src: "/images/galeria/04.png", alt: "Penteado com textura e volume", tag: "Penteados", note: "Leve e fácil de manter" },
+  { id: "g3", src: "/images/galeria/003.png", alt: "Corte em camadas e alisamento", tag: "Corte", note: "Luz e dimensão" },
+  { id: "g4", src: "/images/galeria/004.png", alt: "Penteado com textura e volume", tag: "Penteados", note: "Leve e fácil de manter" },
   { id: "g5", src: "/images/galeria/05.png", alt: "Penteado com acabamento suave", tag: "Penteados", note: "Elegante e volumoso" },
-  { id: "g6", src: "/images/galeria/06.png", alt: "Coloração tinta fantasia", tag: "Cor", note: "Coloração com mechas" },
-  { id: "g7", src: "/images/galeria/07.png", alt: "Penteado com ondas", tag: "Penteados", note: "Movimento natural" },
+  { id: "g6", src: "/images/galeria/006.png", alt: "Coloração tinta fantasia", tag: "Cor", note: "Coloração e alisamento" },
+  { id: "g7", src: "/images/galeria/07.png", alt: "Penteado com ondas, volume e trança", tag: "Penteados", note: "Movimento natural" },
   { id: "g8", src: "/images/galeria/08.png", alt: "Corte curto e banho de brilho", tag: "Corte", note: "Corte curto channel" },
+  { id: "g9", src: "/images/galeria/09.png", alt: "Coloração, hidratação e corte em camadas com volume", tag: "Cor", note: "Coloração tinta fantasia" },
+  { id: "g10", src: "/images/galeria/10.png", alt: "Progressiva", tag: "Corte", note: "Corte com progressiva" },
+  { id: "g11", src: "/images/galeria/11.png", alt: "Penteado com trança", tag: "Penteados", note: "Penteado com trança e hidratação" },
+  { id: "g12", src: "/images/galeria/12.png", alt: "Penteado com trança", tag: "Penteados", note: "Penteado com trança para evento" },
 ];
 
 const FILTERS: Array<{ key: "Tudo" | GalleryTag; label: string }> = [
@@ -107,46 +111,50 @@ export function GalleryGrid() {
         })}
       </div>
 
-      <div className="columns-2 gap-3 [column-fill:balance] sm:columns-3 sm:gap-4 lg:columns-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
         {filtered.map((item) => (
           <button
             key={item.id}
             type="button"
             onClick={() => setOpenId(item.id)}
-            className="group relative mb-3 block w-full break-inside-avoid overflow-hidden rounded-[22px] border border-[#2f2d2d]/10 bg-white/20 text-left shadow-[0_12px_34px_rgba(47,45,45,0.08)] transition-all hover:-translate-y-0.5 hover:bg-white/30 hover:shadow-[0_18px_48px_rgba(47,45,45,0.12)] sm:mb-4"
+            className="group relative block w-full overflow-hidden rounded-[22px] border border-[#2f2d2d]/10 bg-white/20 text-left shadow-[0_12px_34px_rgba(47,45,45,0.08)] transition-all hover:-translate-y-0.5 hover:bg-white/30 hover:shadow-[0_18px_48px_rgba(47,45,45,0.12)]"
             aria-label={`Abrir imagem: ${item.alt}`}
           >
-            <div className="relative w-full">
-              <div className="relative aspect-4/5 w-full">
-                <Image
-                  src={item.src}
-                  alt={item.alt}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-[1.06]"
-                />
-              </div>
+            <div className="relative aspect-4/5 w-full transform-gpu">
+              <Image
+                src={item.src}
+                alt={item.alt}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-cover transition-transform duration-500 group-hover:scale-[1.06]"
+              />
+            </div>
 
-              <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(47,45,45,.55),transparent_60%)] opacity-70 transition-opacity duration-300 group-hover:opacity-95" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(47,45,45,.55),transparent_60%)] opacity-70 transition-opacity duration-300 group-hover:opacity-95" />
 
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                <div className="flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs font-semibold text-[#edeae2]">
-                  <ZoomIcon />
-                  Ver
-                </div>
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <div className="flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs font-semibold text-[#edeae2]">
+                <ZoomIcon />
+                Ver
               </div>
+            </div>
 
-              <div className="absolute bottom-0 left-0 right-0 p-3">
-                <p className="text-xs font-semibold text-[#edeae2]">{item.tag}</p>
-                <p className="mt-0.5 text-[11px] text-[#edeae2]/85">{item.note ?? "Detalhe e finalização"}</p>
-              </div>
+            <div className="absolute bottom-0 left-0 right-0 p-3">
+              <p className="text-xs font-semibold text-[#edeae2]">{item.tag}</p>
+              <p className="mt-0.5 text-[11px] text-[#edeae2]/85">{item.note ?? "Detalhe e finalização"}</p>
             </div>
           </button>
         ))}
       </div>
 
-      {openItem && (
+      {openItem ? (
         <div className="fixed inset-0 z-80">
-          <div className="pointer-events-none absolute inset-0 bg-[#2f2d2d]/60" />
+          <button
+            type="button"
+            aria-label="Fechar"
+            onClick={() => setOpenId(null)}
+            className="absolute inset-0 bg-[#2f2d2d]/60"
+          />
 
           <div className="pointer-events-auto fixed left-1/2 top-1/2 w-[min(92vw,720px)] -translate-x-1/2 -translate-y-1/2 px-2">
             <div className="glass overflow-hidden rounded-[28px] border border-white/15 shadow-[0_30px_90px_rgba(0,0,0,0.35)]">
@@ -190,10 +198,9 @@ export function GalleryGrid() {
               </div>
 
               <div className="w-full bg-white/20">
-                <div className="relative h-[62vh] w-full">
-                  <Image src={openItem.src} alt={openItem.alt} fill className="object-contain" />
+                <div className="relative h-[62vh] w-full transform-gpu">
+                  <Image src={openItem.src} alt={openItem.alt} fill className="object-contain" sizes="92vw" />
                 </div>
-              </div>
               </div>
             </div>
 
@@ -203,8 +210,8 @@ export function GalleryGrid() {
               </span>
             </div>
           </div>
-        
-      )}
+        </div>
+      ) : null}
     </div>
   );
 }

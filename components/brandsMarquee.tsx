@@ -12,7 +12,6 @@ const brands: Brand[] = [
   { name: "Inoar", logo: "/images/brands/inoar.png" },
   { name: "Truss", logo: "/images/brands/truss.png" },
   { name: "L'Oréal Professionnel", logo: "/images/brands/loreal.png" },
-  { name: "Kérastase", logo: "/images/brands/kerastase.png" },
   { name: "Schwarzkopf", logo: "/images/brands/schwarzkopf.png" },
 ];
 

@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { SectionTitle } from "@/components/sectionTitle";
-import { site } from "@/content/site";
+import { SectionTitle } from "@/components/SectionTitleMenu";
+import { site } from "@/content/Site";
 
 function waLink() {
   const text = encodeURIComponent(

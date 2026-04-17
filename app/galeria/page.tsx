@@ -1,8 +1,8 @@
-import { SectionTitle } from "@/components/sectionTitle";
-import { GalleryAbout } from "@/components/galleryAbout";
-import { GalleryGrid } from "@/components/galleryGrid";
-import { Certificates } from "@/components/certificates";
-import { CTAButtons } from "@/components/CTAbuttons";
+import { SectionTitle } from "@/components/SectionTitleMenu";
+import { GalleryAbout } from "@/components/GalleryAbout";
+import { GalleryGrid } from "@/components/GalleryGrid";
+import { Certificates } from "@/components/Certificates";
+import { CTAButtons } from "@/components/CTAButtons";
 
 export default function GaleriaPage() {
   return (

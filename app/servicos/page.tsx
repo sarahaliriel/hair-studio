@@ -1,6 +1,6 @@
-import { SectionTitle } from "@/components/sectionTitle";
-import { ServicesMenu } from "@/components/servicesMenu";
-import { CTAButtons } from "@/components/CTAbuttons";
+import { SectionTitle } from "@/components/SectionTitleMenu";
+import { ServicesMenu } from "@/components/ServicesMenu";
+import { CTAButtons } from "@/components/CTAButtons";
 
 export default function ServicosPage() {
   return (

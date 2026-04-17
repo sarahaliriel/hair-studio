@@ -102,10 +102,12 @@ body {
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.44);
+  background: rgba(255, 255, 255, 0.50);
   border: 1px solid rgba(47, 45, 45, 0.12);
   box-shadow: var(--shadow-soft);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
+  isolation: isolate;
 }
 
 .soft-card {

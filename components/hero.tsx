@@ -22,7 +22,7 @@ export function Hero() {
         <div className="grid items-end gap-10 lg:grid-cols-2 lg:gap-16">
           <div className="pb-10 lg:pb-16">
             <p className="text-[11px] tracking-[0.28em] text-[#2f2d2d]/70">
-              TRANÇAS • PENTEADOS • MAQUILHAGEM • CORTE
+              TRANÇAS • PENTEADOS • CORTE
             </p>
 
             <h1 className="font-serif mt-6 text-[52px] leading-[0.95] tracking-[-0.02em] text-[#2f2d2d] sm:text-[60px]">

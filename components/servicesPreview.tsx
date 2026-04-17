@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { SectionTitle } from "@/components/sectionTitle";
+import { SectionTitle } from "@/components/SectionTitleMenu";
 
 const services = [
   {

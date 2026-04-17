@@ -1,9 +1,9 @@
-import {Hero} from "@/components/hero";
-import {BrandsMarquee} from "@/components/brandsMarquee";
-import ServicesPreview from "@/components/servicesPreview";
-import ReviewsSection from "@/components/reviewsSection";
-import Differentials from "@/components/differentials";
-import { BookingLocationSection } from "@/components/bookingLocationSection";
+import {Hero} from "@/components/Hero";
+import {BrandsMarquee} from "@/components/BrandsMarquee";
+import ServicesPreview from "@/components/ServicesPreview";
+import ReviewsSection from "@/components/ReviewsSection";
+import Differentials from "@/components/Differentials";
+import { BookingLocationSection } from "@/components/BookingLocationSection";
 
 export default function HomePage() {
   return (
