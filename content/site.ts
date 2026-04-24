@@ -5,7 +5,7 @@ export const site = {
   phoneDisplay: "+351 918 251 771",
   phoneRaw: "+351918251771",
   whatsappRaw: "351918251771",
-  email: "arlete@gmail.com", // trocar depois
+  email: "arlate@sapo.pt",
   addressLine: "R. Silva Carvalho 54B, 1250-255 Lisboa",
   homeServiceText: "Atendimento em salão e ao domicílio em Lisboa (sob marcação).",
   googleMapsEmbedSrc:

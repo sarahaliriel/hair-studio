@@ -1,7 +1,7 @@
 const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
 if (!apiKey) {
-  console.log("Falta GOOGLE_MAPS_API_KEY no ambiente.");
+  console.log("Falta GOOGLE_MAPS_API_KEY");
   process.exit(1);
 }
 
@@ -23,22 +23,10 @@ const res = await fetch("https://places.googleapis.com/v1/places:searchText", {
 
 const data = await res.json();
 
-if (!res.ok) {
-  console.log("Erro:", data);
-  process.exit(1);
-}
-
-const places = Array.isArray(data.places) ? data.places : [];
-
-if (!places.length) {
-  console.log("Não encontrei resultados. Tenta pôr o nome exacto do negócio no textQuery.");
-  process.exit(0);
-}
-
-for (const p of places) {
+for (const p of data.places || []) {
   console.log("ID:", p.id);
-  console.log("Nome:", p.displayName?.text || "");
-  console.log("Morada:", p.formattedAddress || "");
-  console.log("Maps:", p.googleMapsUri || "");
-  console.log("----");
+  console.log("Nome:", p.displayName?.text);
+  console.log("Morada:", p.formattedAddress);
+  console.log("Maps:", p.googleMapsUri);
+  console.log("------");
 }
