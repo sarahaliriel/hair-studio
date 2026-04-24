@@ -49,23 +49,22 @@ export function BookingLocationSection() {
               </Link>
             </div>
 
-            <div className="mt-7 flex items-center justify-between gap-3">
-              <a
-                href={`tel:${site.phoneRaw}`}
-                className="inline-flex flex-1 items-center justify-center rounded-full border border-black/15 bg-white/30 px-5 py-3 text-[12px] font-medium tracking-[0.18em] text-[#2f2d2d] transition-transform duration-200 hover:-translate-y-0.5 hover:bg-white/45 active:translate-y-0"
-              >
-                LIGAR
-              </a>
-
-              <a
-                href={mapsUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex flex-1 items-center justify-center rounded-full border border-[#875f46]/30 bg-[#875f46]/10 px-5 py-3 text-[12px] font-semibold tracking-[0.18em] text-[#5b5545] transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0"
-              >
-                ABRIR ROTA
-              </a>
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              {["Tranças", "Corte", "Coloração", "Hidratação"].map((item) => (
+                <a
+                  key={item}
+                  href={waLink()}
+                  className="rounded-full border border-black/10 bg-white/40 px-4 py-2 text-center text-[11px] tracking-[0.18em] text-[#2f2d2d] transition hover:bg-white/60 hover:-translate-y-0.5"
+                >
+                  {item}
+                </a>
+              ))}
             </div>
+
+            <div className="mt-6 rounded-2xl border border-black/10 bg-white/30 p-4 text-xs text-[#2f2d2d]/70">
+              <p className="mt-1">Atendimento em salão ou domicílio</p>
+            </div>
+
           </div>
 
           <div className="glass soft-card overflow-hidden">
@@ -82,16 +81,6 @@ export function BookingLocationSection() {
                 {site.addressLine}
               </p>
 
-              <div className="mt-6">
-                <a
-                  href={mapsUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex w-full items-center justify-center rounded-full border border-black/15 bg-[#edeae2]/70 px-6 py-3 text-[12px] font-medium tracking-[0.22em] text-[#2f2d2d] transition-transform duration-200 hover:-translate-y-0.5 hover:bg-[#edeae2] active:translate-y-0"
-                >
-                  VER NO MAPA
-                </a>
-              </div>
             </div>
 
             <div className="h-52 w-full border-t border-black/10 bg-[#edeae2] md:h-60">
