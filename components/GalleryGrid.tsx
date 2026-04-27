@@ -83,7 +83,7 @@ export function GalleryGrid() {
             onClick={() => setActiveIndex(null)}
           >
             <motion.div
-              className="relative w-full h-full flex items-center justify-center"
+              className="relative flex items-center justify-center"
               onClick={(e) => e.stopPropagation()}
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
