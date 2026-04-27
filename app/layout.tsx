@@ -45,7 +45,7 @@ export const metadata = {
     title: "Arlete Cabeleireira | Campo de Ourique Lisboa",
     description:
       "Especialista em cabelo em Lisboa. Tranças, coloração, corte e muito mais.",
-    url: "https://arlete-hairstudio",
+    url: "https://arlete.space",
     siteName: "Arlete Cabeleireira",
     locale: "pt_PT",
     type: "website",

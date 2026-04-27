@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo } from "react";
-import { motion } from "framer-motion";
+import { useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 type GalleryItem = {
   id: string;
@@ -14,63 +14,102 @@ type GalleryItem = {
 const ITEMS: GalleryItem[] = [
   { id: "g1", src: "/images/galeria/001.png", alt: "Corte completo", height: 520 },
   { id: "g2", src: "/images/galeria/02.png", alt: "Penteado elegante", height: 640 },
-  { id: "g3", src: "/images/galeria/003.png", alt: "Corte em camadas", height: 480 },
-  { id: "g4", src: "/images/galeria/004.png", alt: "Penteado volumoso", height: 700 },
-  { id: "g5", src: "/images/galeria/05.png", alt: "Penteado suave", height: 560 },
-  { id: "g6", src: "/images/galeria/006.png", alt: "Coloração fantasia", height: 600 },
-  { id: "g7", src: "/images/galeria/07.png", alt: "Ondas naturais", height: 520 },
-  { id: "g8", src: "/images/galeria/08.png", alt: "Corte curto", height: 460 },
-  { id: "g9", src: "/images/galeria/09.png", alt: "Coloração criativa", height: 680 },
-  { id: "g10", src: "/images/galeria/10.png", alt: "Progressiva", height: 500 },
-  { id: "g11", src: "/images/galeria/11.png", alt: "Tranças", height: 640 },
-  { id: "g12", src: "/images/galeria/12.png", alt: "Trança evento", height: 580 }
+  { id: "g3", src: "/images/galeria/002.png", alt: "Croche", height: 580 },
+  { id: "g4", src: "/images/galeria/003.png", alt: "Corte em camadas", height: 480 },
+  { id: "g5", src: "/images/galeria/004.png", alt: "Penteado volumoso", height: 700 },
+  { id: "g6", src: "/images/galeria/05.png", alt: "Penteado suave", height: 560 },
+  { id: "g7", src: "/images/galeria/06.png", alt: "Coloração fantasia", height: 600 },
+  { id: "g8", src: "/images/galeria/6.png", alt: "Travesseiro para bebe", height: 580 },
+  { id: "g9", src: "/images/galeria/07.png", alt: "Ondas naturais", height: 520 },
+  { id: "g10", src: "/images/galeria/08.png", alt: "Corte curto", height: 460 },
+  { id: "g11", src: "/images/galeria/008.png", alt: "Mosqueteiro para bebe", height: 580 },
+  { id: "g12", src: "/images/galeria/09.png", alt: "Coloração criativa", height: 680 },
+  { id: "g13", src: "/images/galeria/10.png", alt: "Progressiva", height: 500 },
+  { id: "g14", src: "/images/galeria/11.png", alt: "Tranças", height: 640 },
+  { id: "g15", src: "/images/galeria/12.png", alt: "Trança evento", height: 580 },
+  { id: "g16", src: "/images/galeria/13.png", alt: "Arte Cachorro", height: 580 },
+  { id: "g17", src: "/images/galeria/013.png", alt: "Croche de bolsas", height: 580 },
+  { id: "g18", src: "/images/galeria/14.png", alt: "Corte feminino", height: 580 },
+  { id: "g19", src: "/images/galeria/15.png", alt: "Trança elegante", height: 580 },
+  { id: "g20", src: "/images/galeria/015.png", alt: "Croche de enfeite para vasos", height: 580 }
 ];
-
-function WhatsAppIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5">
-      <path
-        fill="currentColor"
-        d="M12 2a10 10 0 0 0-8.6 15l-1.1 4.1 4.3-1.1A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-2.6.7.7-2.5-.2-.3A8 8 0 1 1 12 20zm4.2-5.8c-.2-.1-1.2-.6-1.4-.7-.2-.1-.4-.1-.6.1-.2.2-.7.7-.9.8-.2.1-.3.1-.6 0-.3-.1-1.1-.4-2.1-1.3-.8-.7-1.3-1.6-1.5-1.9-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.2-.8.8-.8 1.9 0 1.1.8 2.2.9 2.4.1.2 1.6 2.5 3.8 3.4 2.2.9 2.2.6 2.6.6.4 0 1.3-.5 1.5-1 .2-.5.2-.9.1-1z"
-      />
-    </svg>
-  );
-}
-
-function waLink() {
-  const text = encodeURIComponent("Olá! Gostava de marcar um atendimento 😊");
-  return `https://wa.me/351000000000?text=${text}`;
-}
 
 export function GalleryGrid() {
   const items = useMemo(() => ITEMS, []);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  const next = () => {
+    if (activeIndex === null) return;
+    setActiveIndex((prev) => (prev! + 1) % items.length);
+  };
+
+  const prev = () => {
+    if (activeIndex === null) return;
+    setActiveIndex((prev) => (prev! - 1 + items.length) % items.length);
+  };
 
   return (
-    <section className="w-full px-4 sm:px-6 lg:px-10 py-10">
-      <div className="columns-2 sm:columns-3 lg:columns-4 gap-4 space-y-4">
-        {items.map((item, index) => (
-          <motion.div
-            key={item.id}
-            initial={{ opacity: 0, y: 40, scale: 0.98 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.6, delay: index * 0.03 }}
-            className="group relative w-full overflow-hidden rounded-[28px] break-inside-avoid bg-[#edeae2] shadow-[0_14px_45px_rgba(47,45,45,0.10)]"
-          >
-            <div className="relative w-full" style={{ height: item.height }}>
-              <Image
-                src={item.src}
-                alt={item.alt}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-                sizes="(max-width: 768px) 50vw, 25vw"
-              />
-            </div>
+    <>
+      <section className="w-full px-4 sm:px-6 lg:px-10 py-10">
+        <div className="columns-2 sm:columns-3 lg:columns-4 gap-4 space-y-4">
+          {items.map((item, index) => (
+            <motion.div
+              key={item.id}
+              onClick={() => setActiveIndex(index)}
+              className="group relative w-full overflow-hidden rounded-[28px] break-inside-avoid cursor-pointer bg-[#edeae2] shadow-[0_14px_45px_rgba(47,45,45,0.10)]"
+              whileHover={{ scale: 0.98 }}
+            >
+              <div className="relative w-full">
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  width={500}
+                  height={700}
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
 
-            <div className="absolute inset-0 bg-linear-to-t from-[#2f2d2d]/40 via-transparent to-transparent opacity-70 group-hover:opacity-100 transition" />
+      <AnimatePresence>
+        {activeIndex !== null && (
+          <motion.div
+            className="fixed inset-0 z-999 bg-[#2f2d2d]/95 flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setActiveIndex(null)}
+          >
+            <motion.div
+              className="relative w-full h-full flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              onDragEnd={(e, info) => {
+                if (info.offset.x < -100) next();
+                if (info.offset.x > 100) prev();
+              }}
+            >
+              <Image
+                src={items[activeIndex].src}
+                alt={items[activeIndex].alt}
+                width={900}
+                height={1200}
+                className="max-h-[90vh] w-auto object-contain rounded-2xl"
+              />
+
+              <button
+                onClick={() => setActiveIndex(null)}
+                className="absolute top-6 right-6 text-white text-2xl"
+              >
+                ✕
+              </button>
+            </motion.div>
           </motion.div>
-        ))}
-      </div>
-    </section>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
