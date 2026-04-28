@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { SectionTitle } from "@/components/SectionTitleMenu";
 
 type ApiPayload = {
@@ -37,7 +37,7 @@ function Stars({ n }: { n: number }) {
         <span
           key={i}
           className={`text-[14px] transition ${
-            i < v ? "text-[#5b5545] scale-100" : "text-[#2f2d2d]/20 scale-95"
+            i < v ? "text-[#5b5545]" : "text-[#2f2d2d]/20"
           }`}
         >
           ★
@@ -61,6 +61,9 @@ function SkeletonCard() {
 export default function ReviewsSection() {
   const [data, setData] = useState<ApiPayload | null>(null);
   const [loading, setLoading] = useState(true);
+  const [active, setActive] = useState(0);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let alive = true;
@@ -91,6 +94,35 @@ export default function ReviewsSection() {
   }, [data]);
 
   const place = data?.place;
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const handleScroll = () => {
+      const children = Array.from(el.children) as HTMLElement[];
+
+      const center = el.scrollLeft + el.offsetWidth / 2;
+
+      let closest = 0;
+      let minDist = Infinity;
+
+      children.forEach((child, i) => {
+        const childCenter = child.offsetLeft + child.offsetWidth / 2;
+        const dist = Math.abs(center - childCenter);
+
+        if (dist < minDist) {
+          minDist = dist;
+          closest = i;
+        }
+      });
+
+      setActive(closest);
+    };
+
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <section className="px-4 py-14">
@@ -124,7 +156,7 @@ export default function ReviewsSection() {
                 href={place.googleMapsUri}
                 target="_blank"
                 rel="noreferrer"
-                className="text-[11px] font-semibold tracking-[0.18em] text-[#875f46] hover:opacity-70 transition"
+                className="text-[11px] font-semibold tracking-[0.18em] text-[#875f46]"
               >
                 VER NO GOOGLE
               </a>
@@ -133,46 +165,82 @@ export default function ReviewsSection() {
         )}
 
         <div className="mt-8">
-          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:block sm:overflow-visible sm:px-0">
-            <div className="columns-1 sm:columns-2 lg:columns-3 gap-4">
-              
-              {loading
-                ? Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
-                : list.map((r, idx) => (
+          <div
+            ref={scrollRef}
+            className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 sm:hidden"
+          >
+            {loading
+              ? Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="min-w-[85%]">
+                    <SkeletonCard />
+                  </div>
+                ))
+              : list.map((r, idx) => {
+                  const isActive = idx === active;
+
+                  return (
                     <div
                       key={`${r.authorName}-${idx}`}
-                      className="group mb-4 break-inside-avoid rounded-[28px] border border-[#2f2d2d]/10 bg-white/60 p-5 shadow-[0_14px_45px_rgba(47,45,45,0.08)] backdrop-blur transition-all duration-300 hover:scale-[1.02]">
-                      <Stars n={Number(r.rating || 0)} />
+                      className="min-w-[85%] snap-center"
+                    >
+                      <div
+                        className={`
+                          rounded-[28px] border border-[#2f2d2d]/10 bg-white/60 p-5
+                          shadow-[0_14px_45px_rgba(47,45,45,0.08)] backdrop-blur
+                          transition-all duration-300
+                          ${isActive ? "scale-100" : "scale-[0.95] opacity-60"}
+                        `}
+                      >
+                        <Stars n={Number(r.rating || 0)} />
 
-                      <p className="mt-3 text-[14px] leading-relaxed text-[#2f2d2d]/85 line-clamp-4 group-hover:line-clamp-none transition-all duration-300">
-                        {r.text ? `“${r.text}”` : "“Experiência excelente.”"}
-                      </p>
+                        <p className="mt-3 text-[14px] leading-relaxed text-[#2f2d2d]/85">
+                          {r.text ? `“${r.text}”` : "“Experiência excelente.”"}
+                        </p>
 
-                      <div className="mt-4 flex items-center justify-between gap-3">
-                        {r.authorUrl ? (
-                          <a
-                            href={r.authorUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-[13px] font-semibold text-[#2f2d2d]"
-                          >
-                            {r.authorName}
-                          </a>
-                        ) : (
+                        <div className="mt-4 flex items-center justify-between gap-3">
                           <p className="text-[13px] font-semibold text-[#2f2d2d]">
                             {r.authorName}
                           </p>
-                        )}
 
-                        {r.relativeTime && (
-                          <p className="text-[12px] text-[#2f2d2d]/55">
-                            {r.relativeTime}
-                          </p>
-                        )}
+                          {r.relativeTime && (
+                            <p className="text-[12px] text-[#2f2d2d]/55">
+                              {r.relativeTime}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  ))}
-            </div>
+                  );
+                })}
+          </div>
+
+          <div className="hidden sm:block columns-1 sm:columns-2 lg:columns-3 gap-4">
+            {loading
+              ? Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
+              : list.map((r, idx) => (
+                  <div
+                    key={`${r.authorName}-${idx}`}
+                    className="group mb-4 break-inside-avoid rounded-[28px] border border-[#2f2d2d]/10 bg-white/60 p-5 shadow-[0_14px_45px_rgba(47,45,45,0.08)] backdrop-blur transition-all duration-300 hover:scale-[1.02]"
+                  >
+                    <Stars n={Number(r.rating || 0)} />
+
+                    <p className="mt-3 text-[14px] leading-relaxed text-[#2f2d2d]/85 line-clamp-4 group-hover:line-clamp-none transition-all duration-300">
+                      {r.text ? `“${r.text}”` : "“Experiência excelente.”"}
+                    </p>
+
+                    <div className="mt-4 flex items-center justify-between gap-3">
+                      <p className="text-[13px] font-semibold text-[#2f2d2d]">
+                        {r.authorName}
+                      </p>
+
+                      {r.relativeTime && (
+                        <p className="text-[12px] text-[#2f2d2d]/55">
+                          {r.relativeTime}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
           </div>
         </div>
       </div>
