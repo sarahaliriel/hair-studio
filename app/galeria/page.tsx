@@ -5,14 +5,18 @@ import { CTAButtons } from "@/components/CTAButtons";
 export default function GaleriaPage() {
   return (
     <main className="bg-[#edeae2] text-[#2f2d2d] overflow-x-hidden">
-      <section className="px-4 pt-24 pb-10">
+      <section className="mx-auto max-w-6xl px-4 pt-24 pb-6">
+        <SectionTitle
+          overline="Galeria"
+          title="Transformações reais"
+          desc="Alguns dos meus trabalhos em tranças, coloração, cortes e penteados. Cada look é feito à medida de cada pessoa."
+        />
       </section>
-
-      <section id="galeria" className="px-4 pb-10">
-            <div className="p-6 sm:p-10">
-              <GalleryGrid />
-            </div>
-      </section>
+<section id="galeria" className="px-4 pb-8">
+  <div className="mx-auto w-full max-w-6xl">
+    <GalleryGrid />
+  </div>
+</section>
 
       <section className="px-4 pb-16">
         <div className="mx-auto w-full max-w-5xl">
@@ -23,7 +27,7 @@ export default function GaleriaPage() {
                 title="Gostou do que viu?"
                 desc="Vamos marcar! Diz-me o serviço, o dia e se preferes salão ou domicílio. Eu respondo o mais rápido possível."
               />
-              <div className="mt-6">
+              <div className="mt-4">
                 <CTAButtons />
               </div>
             </div>
