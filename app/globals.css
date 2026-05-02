@@ -32,7 +32,11 @@ html.cursor-hidden textarea,
 html.cursor-hidden select,
 html.cursor-hidden label,
 html.cursor-hidden summary {
-  cursor: inherit !important;
+cursor: inherit !important;
+}
+
+.cursor-hidden * {
+  cursor: none !important;
 }
 
 @supports (-webkit-touch-callout: none) {
