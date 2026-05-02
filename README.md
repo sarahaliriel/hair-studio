@@ -118,3 +118,34 @@
 </details>
 
 ##
+
+<div align="center">
+  <samp>
+    <b>
+      License
+    </b>
+  </samp>
+  <br><br>
+
+  <samp>
+    This project is licensed under the MIT License.
+  </samp>
+</div>
+
+<br>
+
+<div align="center">
+  <samp>
+    <b>
+      Notice
+    </b>
+  </samp>
+  <br><br>
+
+  <samp>
+    This project was developed for a real client (Arlete Hair Studio). <br>
+    All business-related content such as images, branding, and text belongs to the client <br>
+    and may not be reused, reproduced, or distributed without explicit permission. <br>
+    The source code is provided for educational and portfolio purposes only.
+  </samp>
+</div>
