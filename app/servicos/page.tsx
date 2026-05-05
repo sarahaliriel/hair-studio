@@ -1,7 +1,7 @@
 import { SectionTitle } from "@/components/SectionTitleMenu";
 import { ServicesMenu } from "@/components/ServicesMenu";
-import { CTAButtons } from "@/components/CTAButtons";
-import ScrollIndicator from "@/components/ScrollIndicator";
+import { CTAButtons } from "@/shared/ui/CTAButtons";
+import ScrollIndicator from "@/shared/ui/ScrollIndicator";
 
 export default function ServicosPage() {
   return (

@@ -4,7 +4,7 @@ import ServicesPreview from "@/components/ServicesPreview";
 import ReviewsSection from "@/components/ReviewsSection";
 import Differentials from "@/components/Differentials";
 import { BookingLocationSection } from "@/components/BookingLocationSection";
-import ScrollIndicator from "@/components/ScrollIndicator";
+import ScrollIndicator from "@/shared/ui/ScrollIndicator";
 
 export default function HomePage() {
   return (
