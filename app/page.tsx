@@ -1,7 +1,7 @@
 import {Hero} from "@/features/home/components/Hero";
 import {BrandsMarquee} from "@/features/home/components/BrandsMarquee";
 import ServicesPreview from "@/features/services/ServicesPreview";
-import ReviewsSection from "@/components/ReviewsSection";
+import ReviewsSection from "@/features/reviews/ReviewsSection";
 import Differentials from "@/features/services/Differentials";
 import { BookingLocationSection } from "@/components/BookingLocationSection";
 import ScrollIndicator from "@/shared/ui/ScrollIndicator";
