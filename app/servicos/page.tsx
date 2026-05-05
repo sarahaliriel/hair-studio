@@ -1,5 +1,5 @@
 import { SectionTitle } from "@/components/SectionTitleMenu";
-import { ServicesMenu } from "@/components/ServicesMenu";
+import { ServicesMenu } from "@/features/services/ServicesMenu";
 import { CTAButtons } from "@/shared/ui/CTAButtons";
 import ScrollIndicator from "@/shared/ui/ScrollIndicator";
 
