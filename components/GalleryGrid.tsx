@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
 
 type GalleryItem = {
   id: string;
@@ -19,7 +20,7 @@ const ITEMS: GalleryItem[] = [
   { id: "g6", src: "/images/galeria/05.png", alt: "Penteado suave" },
   { id: "g7", src: "/images/galeria/06.png", alt: "Coloração fantasia" },
   { id: "g8", src: "/images/galeria/6.png", alt: "Travesseiro para bebe" },
-  { id: "g9", src: "/images/galeria/07.png", alt: "Ondas naturais" },
+  { id: "g9", src: "/images/galeria/007.png", alt: "Ondas naturais" },
   { id: "g10", src: "/images/galeria/08.png", alt: "Corte curto" },
   { id: "g11", src: "/images/galeria/008.png", alt: "Mosqueteiro para bebe" },
   { id: "g12", src: "/images/galeria/09.png", alt: "Coloração criativa" },
@@ -30,10 +31,13 @@ const ITEMS: GalleryItem[] = [
   { id: "g17", src: "/images/galeria/013.png", alt: "Croche de bolsas" },
   { id: "g18", src: "/images/galeria/14.png", alt: "Corte feminino" },
   { id: "g19", src: "/images/galeria/15.png", alt: "Trança elegante" },
-  { id: "g20", src: "/images/galeria/015.png", alt: "Croche vasos" }
+  { id: "g20", src: "/images/galeria/015.png", alt: "Croche vasos" },
+  { id: "g21", src: "/images/galeria/16.png", alt: "Penteado elegante para festa" },
+  { id: "g22", src: "/images/galeria/17.png", alt: "Bolsas de croche" }
 ];
 
 export function GalleryGrid() {
+  
   const items = useMemo(() => ITEMS, []);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
@@ -46,6 +50,18 @@ export function GalleryGrid() {
     if (activeIndex === null) return;
     setActiveIndex((prev) => (prev! - 1 + items.length) % items.length);
   };
+
+  useEffect(() => {
+  if (activeIndex === null) return;
+
+  const nextIndex = (activeIndex + 1) % items.length;
+  const prevIndex = (activeIndex - 1 + items.length) % items.length;
+
+  [items[nextIndex], items[prevIndex]].forEach((item) => {
+    const img = new window.Image();
+    img.src = item.src;
+  });
+}, [activeIndex, items]);
 
   return (
     <>
@@ -87,7 +103,7 @@ export function GalleryGrid() {
             onClick={() => setActiveIndex(null)}
           >
             <motion.div
-              className="relative w-full h-full flex items-center justify-center px-4"
+              className="relative flex items-center justify-center px-4"
               onClick={(e) => e.stopPropagation()}
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
@@ -102,6 +118,8 @@ export function GalleryGrid() {
                   alt={items[activeIndex].alt}
                   width={900}
                   height={1200}
+                  priority
+                  loading="eager"
                   className="max-h-[85vh] w-auto object-contain rounded-2xl"
                   onClick={() => setActiveIndex(null)}
                 />
