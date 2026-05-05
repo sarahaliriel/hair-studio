@@ -10,25 +10,25 @@ const services = [
     title: "Tranças",
     desc: "Estilos protetores e personalizados, com acabamento premium.",
     tag: "Mais pedido",
-    image: "/images/servicos/tranças.png",
+    image: "/images/services/tranças.png",
   },
   {
     title: "Penteados",
     desc: "Estilos personalizados para eventos especiais e ocasiões únicas.",
     tag: "Eventos",
-    image: "/images/servicos/penteado.png",
+    image: "/images/services/penteado.png",
   },
   {
     title: "Corte",
     desc: "Mulheres, homens e crianças. O corte certo que faz toda a diferença.",
     tag: "Para todos",
-    image: "/images/servicos/corte.png",
+    image: "/images/services/corte.png",
   },
   {
     title: "Coloração e mechas",
     desc: "Cor com técnica e cuidado, para um resultado luminoso e saudável.",
     tag: "Transformação",
-    image: "/images/servicos/coloracao.jpg",
+    image: "/images/services/coloracao.jpg",
   },
 ];
 

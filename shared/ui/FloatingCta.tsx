@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
-import { site } from "@/content/Site";
+import { site } from "@/config/Site";
 
 export function FloatingCTA() {
   const [visible, setVisible] = useState(false);

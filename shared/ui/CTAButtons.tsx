@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { site } from "@/content/Site";
+import { site } from "@/config/Site";
 
 export function CTAButtons() {
   const [isOpenHours, setIsOpenHours] = useState<boolean>(true);

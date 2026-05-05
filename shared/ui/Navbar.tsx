@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { site } from "@/content/Site";
+import { site } from "@/config/Site";
 
 type NavItem = { label: string; href: string };
 
