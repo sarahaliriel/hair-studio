@@ -36,7 +36,7 @@ function Stars({ n }: { n: number }) {
       {Array.from({ length: 5 }).map((_, i) => (
         <span
           key={i}
-          className={`text-[14px] transition ${
+          className={`text-[14px] ${
             i < v ? "text-[#5b5545]" : "text-[#2f2d2d]/20"
           }`}
         >
@@ -61,7 +61,6 @@ function SkeletonCard() {
 export default function ReviewsSection() {
   const [data, setData] = useState<ApiPayload | null>(null);
   const [loading, setLoading] = useState(true);
-  const [active, setActive] = useState(0);
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -89,40 +88,12 @@ export default function ReviewsSection() {
   }, []);
 
   const list = useMemo(() => {
-    if (data?.ok && Array.isArray(data.reviews) && data.reviews.length) return data.reviews;
+    if (data?.ok && Array.isArray(data.reviews) && data.reviews.length)
+      return data.reviews;
     return fallback;
   }, [data]);
 
   const place = data?.place;
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    const handleScroll = () => {
-      const children = Array.from(el.children) as HTMLElement[];
-
-      const center = el.scrollLeft + el.offsetWidth / 2;
-
-      let closest = 0;
-      let minDist = Infinity;
-
-      children.forEach((child, i) => {
-        const childCenter = child.offsetLeft + child.offsetWidth / 2;
-        const dist = Math.abs(center - childCenter);
-
-        if (dist < minDist) {
-          minDist = dist;
-          closest = i;
-        }
-      });
-
-      setActive(closest);
-    };
-
-    el.addEventListener("scroll", handleScroll, { passive: true });
-    return () => el.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
     <section className="px-4 py-14">
@@ -134,7 +105,7 @@ export default function ReviewsSection() {
         />
 
         {place?.name && (
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#2f2d2d]/10 bg-white/50 backdrop-blur px-4 py-3 shadow-sm">
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#2f2d2d]/10 bg-white px-4 py-3 shadow-sm sm:backdrop-blur">
             <div className="flex items-center gap-3">
               <span className="text-[12px] font-semibold tracking-[0.18em] text-[#2f2d2d]">
                 {place.name}
@@ -167,60 +138,70 @@ export default function ReviewsSection() {
         <div className="mt-8">
           <div
             ref={scrollRef}
-            className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 sm:hidden"
+            className="
+              flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 sm:hidden scroll-smooth
+              [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
+            "
           >
             {loading
               ? Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="min-w-[85%]">
+                  <div key={i} className="min-w-[85%] snap-center">
                     <SkeletonCard />
                   </div>
                 ))
-              : list.map((r, idx) => {
-                  const isActive = idx === active;
-
-                  return (
+              : list.map((r, idx) => (
+                  <div
+                    key={`${r.authorName}-${idx}`}
+                    className="min-w-[85%] snap-center group"
+                  >
                     <div
-                      key={`${r.authorName}-${idx}`}
-                      className="min-w-[85%] snap-center"
+                      className="
+                        rounded-[28px]
+                        border border-[#2f2d2d]/10
+                        bg-white
+                        p-5
+                        shadow-[0_14px_45px_rgba(47,45,45,0.08)]
+                        transition-opacity duration-300
+                        opacity-70
+                        group-[&:has(:hover)]:opacity-100
+                      "
                     >
-                      <div
-                        className={`
-                          rounded-[28px] border border-[#2f2d2d]/10 bg-white/60 p-5
-                          shadow-[0_14px_45px_rgba(47,45,45,0.08)] backdrop-blur
-                          transition-all duration-300
-                          ${isActive ? "scale-100" : "scale-[0.95] opacity-60"}
-                        `}
-                      >
-                        <Stars n={Number(r.rating || 0)} />
+                      <Stars n={Number(r.rating || 0)} />
 
-                        <p className="mt-3 text-[14px] leading-relaxed text-[#2f2d2d]/85">
-                          {r.text ? `“${r.text}”` : "“Experiência excelente.”"}
+                      <p className="mt-3 text-[14px] leading-relaxed text-[#2f2d2d]/85">
+                        {r.text ? `“${r.text}”` : "“Experiência excelente.”"}
+                      </p>
+
+                      <div className="mt-4 flex items-center justify-between gap-3">
+                        <p className="text-[13px] font-semibold text-[#2f2d2d]">
+                          {r.authorName}
                         </p>
 
-                        <div className="mt-4 flex items-center justify-between gap-3">
-                          <p className="text-[13px] font-semibold text-[#2f2d2d]">
-                            {r.authorName}
+                        {r.relativeTime && (
+                          <p className="text-[12px] text-[#2f2d2d]/55">
+                            {r.relativeTime}
                           </p>
-
-                          {r.relativeTime && (
-                            <p className="text-[12px] text-[#2f2d2d]/55">
-                              {r.relativeTime}
-                            </p>
-                          )}
-                        </div>
+                        )}
                       </div>
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
           </div>
 
           <div className="hidden sm:block columns-1 sm:columns-2 lg:columns-3 gap-4">
             {loading
-              ? Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
+              ? Array.from({ length: 3 }).map((_, i) => (
+                  <SkeletonCard key={i} />
+                ))
               : list.map((r, idx) => (
                   <div
                     key={`${r.authorName}-${idx}`}
-                    className="group mb-4 break-inside-avoid rounded-[28px] border border-[#2f2d2d]/10 bg-white/60 p-5 shadow-[0_14px_45px_rgba(47,45,45,0.08)] backdrop-blur transition-all duration-300 hover:scale-[1.02]"
+                    className="
+                      group mb-4 break-inside-avoid rounded-[28px]
+                      border border-[#2f2d2d]/10 bg-white/80 p-5
+                      shadow-[0_14px_45px_rgba(47,45,45,0.08)]
+                      transition-all duration-300 hover:scale-[1.02]
+                    "
                   >
                     <Stars n={Number(r.rating || 0)} />
 
