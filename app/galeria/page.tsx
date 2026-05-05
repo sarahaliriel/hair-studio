@@ -1,5 +1,5 @@
 import { SectionTitle } from "@/components/SectionTitleMenu";
-import { GalleryGrid } from "@/components/GalleryGrid";
+import { GalleryGrid } from "@/features/gallery/GalleryGrid";
 import { CTAButtons } from "@/shared/ui/CTAButtons";
 
 export default function GaleriaPage() {
