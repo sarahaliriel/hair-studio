@@ -3,7 +3,7 @@ import {BrandsMarquee} from "@/features/home/components/BrandsMarquee";
 import ServicesPreview from "@/features/services/ServicesPreview";
 import ReviewsSection from "@/features/reviews/ReviewsSection";
 import Differentials from "@/features/services/Differentials";
-import { BookingLocationSection } from "@/components/BookingLocationSection";
+import { BookingLocationSection } from "@/features/location/BookingLocationSection";
 import ScrollIndicator from "@/shared/ui/ScrollIndicator";
 
 export default function HomePage() {

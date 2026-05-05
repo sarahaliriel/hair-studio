@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { SectionTitle } from "@/components/SectionTitleMenu";
+import { SectionTitle } from "@/shared/ui/SectionTitleMenu";
 import { motion } from "framer-motion";
 
 const services = [

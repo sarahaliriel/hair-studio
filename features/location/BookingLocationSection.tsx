@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SectionTitle } from "@/components/SectionTitleMenu";
+import { SectionTitle } from "@/shared/ui/SectionTitleMenu";
 import { site } from "@/content/Site";
 
 function waLink() {

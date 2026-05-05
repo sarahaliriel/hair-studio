@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { SectionTitle } from "@/components/SectionTitleMenu";
+import { SectionTitle } from "@/shared/ui/SectionTitleMenu";
 
 type ApiPayload = {
   ok: boolean;

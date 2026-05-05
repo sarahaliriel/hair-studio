@@ -1,4 +1,4 @@
-import { SectionTitle } from "@/components/SectionTitleMenu";
+import { SectionTitle } from "@/shared/ui/SectionTitleMenu";
 import { GalleryGrid } from "@/features/gallery/GalleryGrid";
 import { CTAButtons } from "@/shared/ui/CTAButtons";
 
