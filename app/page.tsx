@@ -1,5 +1,5 @@
-import {Hero} from "@/components/Hero";
-import {BrandsMarquee} from "@/components/BrandsMarquee";
+import {Hero} from "@/features/home/components/Hero";
+import {BrandsMarquee} from "@/features/home/components/BrandsMarquee";
 import ServicesPreview from "@/components/ServicesPreview";
 import ReviewsSection from "@/components/ReviewsSection";
 import Differentials from "@/components/Differentials";
