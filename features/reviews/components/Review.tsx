@@ -1,4 +1,4 @@
-import { reviews } from "@/content/Review";
+import { reviews } from "@/features/reviews/data/Review";
 
 export function Reviews() {
   return (
