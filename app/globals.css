@@ -39,6 +39,36 @@ cursor: inherit !important;
   cursor: none !important;
 }
 
+* {
+  scrollbar-width: none;
+}
+
+body.scrolling * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(91, 85, 69, 0.75) rgba(47, 45, 45, 0.10);
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+body.scrolling ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+body.scrolling ::-webkit-scrollbar-track {
+  background: rgba(47, 45, 45, 0.08);
+  border-radius: 999px;
+}
+
+body.scrolling ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(91, 85, 69, 0.92), rgba(135, 95, 70, 0.85));
+  border-radius: 999px;
+  border: 2px solid rgba(237, 234, 226, 0.9);
+}
+
 @supports (-webkit-touch-callout: none) {
   .ios-no-blur {
     backdrop-filter: none !important;
@@ -142,35 +172,6 @@ body {
   border: 1px solid rgba(47, 45, 45, 0.12);
   background: rgba(237, 234, 226, 0.9);
   padding: 6px 12px;
-}
-
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(91, 85, 69, 0.75) rgba(47, 45, 45, 0.10);
-}
-
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(47, 45, 45, 0.08);
-  border-radius: 999px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(91, 85, 69, 0.92), rgba(135, 95, 70, 0.85));
-  border-radius: 999px;
-  border: 2px solid rgba(237, 234, 226, 0.9);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(91, 85, 69, 1), rgba(135, 95, 70, 0.95));
-}
-
-::-webkit-scrollbar-thumb:active {
-  background: linear-gradient(180deg, rgba(91, 85, 69, 0.85), rgba(135, 95, 70, 0.8));
 }
 
 body::before {

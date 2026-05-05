@@ -1,6 +1,7 @@
 import { SectionTitle } from "@/components/SectionTitleMenu";
 import { ServicesMenu } from "@/components/ServicesMenu";
 import { CTAButtons } from "@/components/CTAButtons";
+import ScrollIndicator from "@/components/ScrollIndicator";
 
 export default function ServicosPage() {
   return (
@@ -19,7 +20,9 @@ export default function ServicosPage() {
           title="Preferes explicar primeiro?"
           desc="Envia mensagem no WhatsApp, é o mais rápido!"
         />
+        <ScrollIndicator />
         <CTAButtons />
+        
       </div>
     </div>
   );

@@ -23,7 +23,7 @@ export function FloatingCTA() {
     if (isGaleria) {
       return {
         label: "VER SERVIÇOS",
-        href: "/#servicos",
+        href: "/servicos",
       };
     }
 

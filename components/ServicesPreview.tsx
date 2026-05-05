@@ -43,26 +43,21 @@ export default function ServicesPreview() {
         />
 
         <div className="mt-8 flex gap-4 overflow-x-auto pb-2 sm:hidden snap-x snap-mandatory">
-          {services.map((s, i) => (
-            <motion.div
-              key={s.title}
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="min-w-[80%] snap-center"
-            >
+          {services.map((s) => (
+            <div key={s.title} className="min-w-[80%] snap-center">
               <Card service={s} />
-            </motion.div>
+            </div>
           ))}
         </div>
-        
+
         <div className="mt-8 hidden sm:grid grid-cols-2 gap-6">
           {services.map((s, i) => (
             <motion.div
               key={s.title}
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 25 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.08 }}
             >
               <Card service={s} />
             </motion.div>
@@ -105,7 +100,7 @@ function Card({ service }: any) {
           {service.title}
         </h3>
 
-        <p className="mt-2 text-sm text-[#2f2d2d]/80 transition-all duration-300 group-hover:text-[#2f2d2d]">
+        <p className="mt-2 text-sm text-[#2f2d2d]/80">
           {service.desc}
         </p>
 
