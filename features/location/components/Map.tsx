@@ -1,4 +1,4 @@
-import { site } from "@/content/Site";
+import { site } from "@/config/Site";
 
 export function MapSection() {
   return (

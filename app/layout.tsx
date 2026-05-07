@@ -1,11 +1,11 @@
 // @ts-ignore
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
-import { FloatingCTA } from "@/components/FloatingCta";
+import { Navbar } from "@/shared/ui/Navbar";
+import { Footer } from "@/shared/ui/Footer";
+import { FloatingCTA } from "@/shared/ui/FloatingCta";
 import { Cormorant_Garamond, Inter } from "next/font/google";
-import CustomCursor from "@/components/Cursor";
+import CustomCursor from "@/shared/ui/Cursor";
 
 const serif = Cormorant_Garamond({
   subsets: ["latin"],

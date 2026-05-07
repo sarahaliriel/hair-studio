@@ -1,4 +1,4 @@
-import { SectionTitle } from "@/components/SectionTitleMenu";
+import { SectionTitle } from "@/shared/ui/SectionTitleMenu";
 
 const items = [
   {

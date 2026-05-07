@@ -1,10 +1,10 @@
-import {Hero} from "@/components/Hero";
-import {BrandsMarquee} from "@/components/BrandsMarquee";
-import ServicesPreview from "@/components/ServicesPreview";
-import ReviewsSection from "@/components/ReviewsSection";
-import Differentials from "@/components/Differentials";
-import { BookingLocationSection } from "@/components/BookingLocationSection";
-import ScrollIndicator from "@/components/ScrollIndicator";
+import {Hero} from "@/features/home/components/Hero";
+import {BrandsMarquee} from "@/features/home/components/BrandsMarquee";
+import ServicesPreview from "@/features/services/components/ServicesPreview";
+import ReviewsSection from "@/features/reviews/components/ReviewsSection";
+import Differentials from "@/features/services/components/Differentials";
+import { BookingLocationSection } from "@/features/location/components/BookingLocationSection";
+import ScrollIndicator from "@/shared/ui/ScrollIndicator";
 
 export default function HomePage() {
   return (

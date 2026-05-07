@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { serviceCategories, servicesMenu, type ServiceCategoryKey } from "@/content/ServicesMenu";
-import { site } from "@/content/Site";
+import { serviceCategories, servicesMenu, type ServiceCategoryKey } from "@/features/services/data/ServicesMenu";
+import { site } from "@/config/Site";
 
 function normalize(s: string) {
   return s
