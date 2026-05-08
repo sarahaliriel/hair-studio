@@ -49,7 +49,7 @@ function Stars({ n }: { n: number }) {
 
 function SkeletonCard() {
   return (
-    <div className="animate-pulse rounded-[28px] border border-[#2f2d2d]/10 bg-[#edeae2] p-5">
+    <div className="animate-pulse rounded-[28px] border border-[#2f2d2d]/10 bg-[#edeae2] p-5 mb-5 break-inside-avoid">
       <div className="h-3 w-20 bg-[#2f2d2d]/20 rounded mb-3" />
       <div className="h-3 w-full bg-[#2f2d2d]/20 rounded mb-2" />
       <div className="h-3 w-5/6 bg-[#2f2d2d]/20 rounded mb-2" />
@@ -104,8 +104,9 @@ export default function ReviewsSection() {
           desc="Comentários verificados ajudam a decidir com confiança."
         />
 
+        {/* HEADER */}
         {place?.name && (
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#2f2d2d]/10 bg-white px-4 py-3 shadow-sm sm:backdrop-blur">
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#2f2d2d]/10 bg-white px-4 py-3 shadow-sm">
             <div className="flex items-center gap-3">
               <span className="text-[12px] font-semibold tracking-[0.18em] text-[#2f2d2d]">
                 {place.name}
@@ -127,7 +128,7 @@ export default function ReviewsSection() {
                 href={place.googleMapsUri}
                 target="_blank"
                 rel="noreferrer"
-                className="text-[11px] font-semibold tracking-[0.18em] text-[#875f46]"
+                className="text-[11px] font-semibold tracking-[0.18em] text-[#875f46] hover:opacity-70 transition"
               >
                 VER NO GOOGLE
               </a>
@@ -135,13 +136,11 @@ export default function ReviewsSection() {
           </div>
         )}
 
-        <div className="mt-8">
+        {/* MOBILE */}
+        <div className="mt-8 sm:hidden">
           <div
             ref={scrollRef}
-            className="
-              flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 sm:hidden scroll-smooth
-              [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
-            "
+            className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {loading
               ? Array.from({ length: 3 }).map((_, i) => (
@@ -161,9 +160,10 @@ export default function ReviewsSection() {
                         bg-white
                         p-5
                         shadow-[0_14px_45px_rgba(47,45,45,0.08)]
-                        transition-opacity duration-300
-                        opacity-70
-                        group-[&:has(:hover)]:opacity-100
+                        transition-all duration-300
+                        opacity-80
+                        group-hover:opacity-100
+                        group-hover:scale-[1.02]
                       "
                     >
                       <Stars n={Number(r.rating || 0)} />
@@ -187,42 +187,52 @@ export default function ReviewsSection() {
                   </div>
                 ))}
           </div>
+        </div>
 
-          <div className="hidden sm:block columns-1 sm:columns-2 lg:columns-3 gap-4">
-            {loading
-              ? Array.from({ length: 3 }).map((_, i) => (
-                  <SkeletonCard key={i} />
-                ))
-              : list.map((r, idx) => (
-                  <div
-                    key={`${r.authorName}-${idx}`}
-                    className="
-                      group mb-4 break-inside-avoid rounded-[28px]
-                      border border-[#2f2d2d]/10 bg-white/80 p-5
-                      shadow-[0_14px_45px_rgba(47,45,45,0.08)]
-                      transition-all duration-300 hover:scale-[1.02]
-                    "
-                  >
-                    <Stars n={Number(r.rating || 0)} />
+        {/* DESKTOP MASONRY */}
+        <div className="hidden sm:block columns-1 sm:columns-2 lg:columns-3 gap-5 mt-8">
+          {loading
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <SkeletonCard key={i} />
+              ))
+            : list.map((r, idx) => (
+                <div
+                  key={`${r.authorName}-${idx}`}
+                  className="
+                    mb-5 break-inside-avoid
+                    rounded-[28px]
+                    border border-[#2f2d2d]/10
+                    bg-white/90
+                    p-5
+                    shadow-[0_14px_45px_rgba(47,45,45,0.08)]
+                    transition-all duration-300
+                    hover:scale-[1.02]
+                    hover:shadow-[0_20px_60px_rgba(47,45,45,0.12)]
+                  "
+                >
+                  <Stars n={Number(r.rating || 0)} />
 
-                    <p className="mt-3 text-[14px] leading-relaxed text-[#2f2d2d]/85 line-clamp-4 group-hover:line-clamp-none transition-all duration-300">
-                      {r.text ? `“${r.text}”` : "“Experiência excelente.”"}
+                  <p className="mt-3 text-[14px] leading-relaxed text-[#2f2d2d]/85">
+                    {r.text
+                      ? r.text.length > 200
+                        ? `“${r.text.slice(0, 200)}...”`
+                        : `“${r.text}”`
+                      : "“Experiência excelente.”"}
+                  </p>
+
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    <p className="text-[13px] font-semibold text-[#2f2d2d]">
+                      {r.authorName}
                     </p>
 
-                    <div className="mt-4 flex items-center justify-between gap-3">
-                      <p className="text-[13px] font-semibold text-[#2f2d2d]">
-                        {r.authorName}
+                    {r.relativeTime && (
+                      <p className="text-[12px] text-[#2f2d2d]/55">
+                        {r.relativeTime}
                       </p>
-
-                      {r.relativeTime && (
-                        <p className="text-[12px] text-[#2f2d2d]/55">
-                          {r.relativeTime}
-                        </p>
-                      )}
-                    </div>
+                    )}
                   </div>
-                ))}
-          </div>
+                </div>
+              ))}
         </div>
       </div>
     </section>
