@@ -6,20 +6,30 @@ export default function ScrollIndicator() {
   useEffect(() => {
     let timeout: any;
 
-    const onScroll = () => {
-      document.body.classList.add("scrolling");
+    const activateScroll = () => {
+      document.documentElement.classList.add("is-scrolling");
 
       clearTimeout(timeout);
 
       timeout = setTimeout(() => {
-        document.body.classList.remove("scrolling");
-      }, 1200);
+        document.documentElement.classList.remove("is-scrolling");
+      }, 500);
+    };
+
+    const onScroll = () => {
+      activateScroll();
+    };
+
+    const onTouchMove = () => {
+      activateScroll();
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
 
     return () => {
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("touchmove", onTouchMove);
       clearTimeout(timeout);
     };
   }, []);
