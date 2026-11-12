@@ -1,4 +1,4 @@
-export type GalleryItem = { id: string; src: string; alt: string };
+export type GalleryItem = { id: string; src: string; alt: string; category?: string };
 export const galleryImages: GalleryItem[] = [
   { id: "g1", src: "/images/gallery/001.png", alt: "Corte completo" },
   { id: "g2", src: "/images/gallery/02.png", alt: "Penteado elegante" },
