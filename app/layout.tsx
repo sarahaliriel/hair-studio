@@ -77,8 +77,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-PT" className={`${serif.variable} ${sans.variable}`}>
+    <html lang="pt-PT" className={`${serif.variable} ${sans.variable}`} suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: `try{if(location.pathname==='/'&&!sessionStorage.getItem('arlete:home-intro:v1')&&!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('intro-pending')}catch{}` }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
