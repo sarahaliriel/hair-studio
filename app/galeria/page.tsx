@@ -1,22 +1,31 @@
+import type { Metadata } from "next";
 import { SectionTitle } from "@/shared/ui/SectionTitleMenu";
 import { GalleryGrid } from "@/features/gallery/components/GalleryGrid";
 import { CTAButtons } from "@/shared/ui/CTAButtons";
 
+export const metadata: Metadata = {
+  title: "Galeria | Arlete Space",
+  description:
+    "Descobre os trabalhos de cabelo e artesanato da Arlete em Lisboa.",
+  alternates: { canonical: "/galeria" },
+};
+
 export default function GaleriaPage() {
   return (
-    <main className="bg-[#edeae2] text-[#2f2d2d] overflow-x-hidden">
-      <section className="mx-auto max-w-6xl px-4 pt-24 pb-6">
+    <div className="overflow-x-hidden">
+      <section className="mx-auto max-w-6xl px-4 pt-14 pb-6">
         <SectionTitle
+          as="h1"
           overline="Galeria"
           title="Transformações reais"
-          desc="Alguns dos meus trabalhos em tranças, coloração, cortes e penteados. Cada look é feito à medida de cada pessoa."
+          desc="Tranças, coloração, cortes e penteados — e uma seleção de trabalhos artesanais da Arlete."
         />
       </section>
-<section id="galeria" className="px-4 pb-8">
-  <div className="mx-auto w-full max-w-6xl">
-    <GalleryGrid />
-  </div>
-</section>
+      <section id="galeria" className="px-4 pb-8">
+        <div className="mx-auto w-full max-w-6xl">
+          <GalleryGrid />
+        </div>
+      </section>
 
       <section className="px-4 pb-16">
         <div className="mx-auto w-full max-w-5xl">
@@ -35,6 +44,6 @@ export default function GaleriaPage() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }
