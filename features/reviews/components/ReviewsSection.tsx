@@ -1,240 +1,87 @@
-"use client";
+import { Button } from "@/components/ui/button";
+import type { ReviewsPayload } from "../data/google-reviews";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { SectionTitle } from "@/shared/ui/SectionTitleMenu";
-
-type ApiPayload = {
-  ok: boolean;
-  place?: {
-    name: string;
-    rating: number;
-    userRatingCount: number;
-    googleMapsUri: string;
-  };
-  reviews?: {
-    rating: number;
-    text: string;
-    authorName: string;
-    authorUrl?: string;
-    relativeTime?: string;
-  }[];
+type Testimonial = {
+  id: string;
+  name: string;
+  review: string;
+  rating?: number;
+  source?: string;
+  sourceUrl?: string;
 };
 
-const fallback: NonNullable<ApiPayload["reviews"]> = [
-  {
-    text: "A melhor cabelereira de sempre! Faço meu cabelo com a Arlete desde 2022 e não me arrependo.",
-    authorName: "Cliente",
-    rating: 5,
-  },
-];
-
-function Stars({ n }: { n: number }) {
-  const v = Math.max(0, Math.min(5, Math.round(n)));
-
+function ReviewCard({ review }: { review: Testimonial }) {
   return (
-    <div className="flex gap-0.5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <span
-          key={i}
-          className={`text-[14px] ${
-            i < v ? "text-[#5b5545]" : "text-[#2f2d2d]/20"
-          }`}
-        >
-          ★
+    <article className="review-card" tabIndex={0}>
+      {review.rating !== undefined && review.rating > 0 && (
+        <span className="review-stars" aria-label={`${review.rating} de 5 estrelas`}>
+          {"★".repeat(Math.min(5, Math.max(0, Math.round(review.rating))))}
         </span>
-      ))}
-    </div>
+      )}
+      <blockquote>“{review.review}”</blockquote>
+      <p className="review-author">{review.name}</p>
+      {review.source && <p className="review-source">{review.source}</p>}
+    </article>
   );
 }
 
-function SkeletonCard() {
+function ReviewRow({ reviews, reverse = false, animated }: { reviews: Testimonial[]; reverse?: boolean; animated: boolean }) {
+  if (!reviews.length) return null;
+  const repeats = animated ? Math.ceil(6 / reviews.length) : 1;
   return (
-    <div className="animate-pulse rounded-[28px] border border-[#2f2d2d]/10 bg-[#edeae2] p-5 mb-5 break-inside-avoid">
-      <div className="h-3 w-20 bg-[#2f2d2d]/20 rounded mb-3" />
-      <div className="h-3 w-full bg-[#2f2d2d]/20 rounded mb-2" />
-      <div className="h-3 w-5/6 bg-[#2f2d2d]/20 rounded mb-2" />
-      <div className="h-3 w-2/3 bg-[#2f2d2d]/20 rounded" />
-    </div>
-  );
-}
-
-export default function ReviewsSection() {
-  const [data, setData] = useState<ApiPayload | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let alive = true;
-
-    fetch("/api/google-reviews")
-      .then((r) => r.json())
-      .then((json: ApiPayload) => {
-        if (!alive) return;
-        setData(json && typeof json.ok === "boolean" ? json : { ok: false });
-      })
-      .catch(() => {
-        if (!alive) return;
-        setData({ ok: false });
-      })
-      .finally(() => {
-        if (!alive) return;
-        setLoading(false);
-      });
-
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  const list = useMemo(() => {
-    if (data?.ok && Array.isArray(data.reviews) && data.reviews.length)
-      return data.reviews;
-    return fallback;
-  }, [data]);
-
-  const place = data?.place;
-
-  return (
-    <section className="px-4 py-14">
-      <div className="mx-auto w-full max-w-5xl">
-        <SectionTitle
-          overline="Opiniões"
-          title="Avaliações reais no Google"
-          desc="Comentários verificados ajudam a decidir com confiança."
-        />
-
-        {/* HEADER */}
-        {place?.name && (
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#2f2d2d]/10 bg-white px-4 py-3 shadow-sm">
-            <div className="flex items-center gap-3">
-              <span className="text-[12px] font-semibold tracking-[0.18em] text-[#2f2d2d]">
-                {place.name}
-              </span>
-
-              <div className="flex items-center gap-2">
-                <span className="text-[14px] font-semibold text-[#5b5545]">
-                  {Number(place.rating || 0).toFixed(1)}
-                </span>
-                <Stars n={place.rating} />
-                <span className="text-[12px] text-[#2f2d2d]/55">
-                  ({place.userRatingCount})
-                </span>
+    <div className={`review-row${reverse ? " review-row-reverse" : ""}${animated ? " review-row-animated" : ""}`} tabIndex={0} aria-label={reverse ? "Avaliações, segunda fila" : "Avaliações, primeira fila"}>
+      <div className="review-track">
+        {[0, ...(animated ? [1] : [])].map((group) => (
+          <div className="review-group" key={group} aria-hidden={group === 1 ? true : undefined}>
+            {Array.from({ length: repeats }, (_, repeat) => reviews.map((review) => (
+              <div className="review-item" key={`${group}-${repeat}-${review.id}`} aria-hidden={repeat > 0 ? true : undefined}>
+                <ReviewCard review={review} />
               </div>
-            </div>
-
-            {place.googleMapsUri && (
-              <a
-                href={place.googleMapsUri}
-                target="_blank"
-                rel="noreferrer"
-                className="text-[11px] font-semibold tracking-[0.18em] text-[#875f46] hover:opacity-70 transition"
-              >
-                VER NO GOOGLE
-              </a>
-            )}
+            )))}
           </div>
-        )}
-
-        {/* MOBILE */}
-        <div className="mt-8 sm:hidden">
-          <div
-            ref={scrollRef}
-            className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          >
-            {loading
-              ? Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="min-w-[85%] snap-center">
-                    <SkeletonCard />
-                  </div>
-                ))
-              : list.map((r, idx) => (
-                  <div
-                    key={`${r.authorName}-${idx}`}
-                    className="min-w-[85%] snap-center group"
-                  >
-                    <div
-                      className="
-                        rounded-[28px]
-                        border border-[#2f2d2d]/10
-                        bg-white
-                        p-5
-                        shadow-[0_14px_45px_rgba(47,45,45,0.08)]
-                        transition-all duration-300
-                        opacity-80
-                        group-hover:opacity-100
-                        group-hover:scale-[1.02]
-                      "
-                    >
-                      <Stars n={Number(r.rating || 0)} />
-
-                      <p className="mt-3 text-[14px] leading-relaxed text-[#2f2d2d]/85">
-                        {r.text ? `“${r.text}”` : "“Experiência excelente.”"}
-                      </p>
-
-                      <div className="mt-4 flex items-center justify-between gap-3">
-                        <p className="text-[13px] font-semibold text-[#2f2d2d]">
-                          {r.authorName}
-                        </p>
-
-                        {r.relativeTime && (
-                          <p className="text-[12px] text-[#2f2d2d]/55">
-                            {r.relativeTime}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-          </div>
-        </div>
-
-        {/* DESKTOP MASONRY */}
-        <div className="hidden sm:block columns-1 sm:columns-2 lg:columns-3 gap-5 mt-8">
-          {loading
-            ? Array.from({ length: 6 }).map((_, i) => (
-                <SkeletonCard key={i} />
-              ))
-            : list.map((r, idx) => (
-                <div
-                  key={`${r.authorName}-${idx}`}
-                  className="
-                    mb-5 break-inside-avoid
-                    rounded-[28px]
-                    border border-[#2f2d2d]/10
-                    bg-white/90
-                    p-5
-                    shadow-[0_14px_45px_rgba(47,45,45,0.08)]
-                    transition-all duration-300
-                    hover:scale-[1.02]
-                    hover:shadow-[0_20px_60px_rgba(47,45,45,0.12)]
-                  "
-                >
-                  <Stars n={Number(r.rating || 0)} />
-
-                  <p className="mt-3 text-[14px] leading-relaxed text-[#2f2d2d]/85">
-                    {r.text
-                      ? r.text.length > 200
-                        ? `“${r.text.slice(0, 200)}...”`
-                        : `“${r.text}”`
-                      : "“Experiência excelente.”"}
-                  </p>
-
-                  <div className="mt-4 flex items-center justify-between gap-3">
-                    <p className="text-[13px] font-semibold text-[#2f2d2d]">
-                      {r.authorName}
-                    </p>
-
-                    {r.relativeTime && (
-                      <p className="text-[12px] text-[#2f2d2d]/55">
-                        {r.relativeTime}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-        </div>
+        ))}
       </div>
+    </div>
+  );
+}
+
+/** Only Google Places reviews supplied by the server are published. */
+export default function ReviewsSection({ data }: { data: ReviewsPayload }) {
+  const reviews: Testimonial[] = data?.ok ? (data.reviews ?? [])
+    .filter((review) => review.text.trim() && review.authorName.trim())
+    .map((review, index) => ({
+      id: `${index}-${review.authorName}-${review.text}`,
+      name: review.authorName,
+      review: review.text,
+      rating: review.rating,
+      source: "Google",
+      sourceUrl: review.authorUrl,
+    })) : [];
+  if (!reviews.length) return null;
+
+  const midpoint = Math.ceil(reviews.length / 2);
+  const twoRows = reviews.length >= 4;
+  const firstRow = twoRows ? reviews.slice(0, midpoint) : reviews;
+  const secondRow = twoRows ? reviews.slice(midpoint) : [];
+  const animated = reviews.length >= 2;
+
+  return (
+    <section className="review-section" id="avaliacoes" aria-labelledby="reviews-title">
+      <div className="review-heading">
+        <h2 id="reviews-title">A beleza está nos <em>detalhes.</em></h2>
+        <p>E nas histórias de quem passa por aqui.</p>
+      </div>
+      <div className={`review-rows${animated ? "" : " review-rows-static"}`}>
+        <ReviewRow reviews={firstRow} animated={animated} />
+        {twoRows && <ReviewRow reviews={secondRow} reverse animated={animated} />}
+      </div>
+      {data.place?.googleMapsUri && (
+        <div className="review-cta">
+          <Button variant="inverse" render={<a href={data.place.googleMapsUri} target="_blank" rel="noopener noreferrer" />}>
+            Ver todas as avaliações
+          </Button>
+        </div>
+      )}
     </section>
   );
 }

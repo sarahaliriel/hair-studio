@@ -1,3 +1,4 @@
+import { ArrowCircle } from "@/components/ui/button";
 import Link from "next/link";
 import { SectionTitle } from "@/shared/ui/SectionTitleMenu";
 import { site } from "@/config/Site";
@@ -43,9 +44,7 @@ export function BookingLocationSection() {
                 className="group inline-flex w-full items-center justify-center gap-3 rounded-full bg-[#5b5545] px-7 py-4 text-[12px] font-semibold tracking-[0.22em] text-[#edeae2] shadow-lg transition-transform duration-200 hover:-translate-y-0.5 hover:bg-[#2f2d2d] active:translate-y-0"
               >
                 MARCAR NO WHATSAPP
-                <span className="transition-transform duration-200 group-hover:translate-x-1">
-                  →
-                </span>
+                <ArrowCircle />
               </Link>
             </div>
 

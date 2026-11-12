@@ -1,140 +1,221 @@
 "use client";
-
+import { Button, ArrowCircle } from "@/components/ui/button";
+import { X } from "lucide-react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useEffect } from "react";
-
-type GalleryItem = {
-  id: string;
-  src: string;
-  alt: string;
-};
-
-const ITEMS: GalleryItem[] = [
-  { id: "g1", src: "/images/gallery/001.png", alt: "Corte completo" },
-  { id: "g2", src: "/images/gallery/02.png", alt: "Penteado elegante" },
-  { id: "g3", src: "/images/gallery/002.png", alt: "Croche" },
-  { id: "g4", src: "/images/gallery/003.png", alt: "Corte em camadas" },
-  { id: "g5", src: "/images/gallery/004.png", alt: "Penteado volumoso" },
-  { id: "g6", src: "/images/gallery/05.png", alt: "Penteado suave" },
-  { id: "g7", src: "/images/gallery/06.png", alt: "Coloração fantasia" },
-  { id: "g8", src: "/images/gallery/6.png", alt: "Travesseiro para bebe" },
-  { id: "g9", src: "/images/gallery/007.png", alt: "Ondas naturais" },
-  { id: "g10", src: "/images/gallery/08.png", alt: "Corte curto" },
-  { id: "g11", src: "/images/gallery/008.png", alt: "Mosqueteiro para bebe" },
-  { id: "g12", src: "/images/gallery/09.png", alt: "Coloração criativa" },
-  { id: "g13", src: "/images/gallery/10.png", alt: "Progressiva" },
-  { id: "g14", src: "/images/gallery/11.png", alt: "Tranças" },
-  { id: "g15", src: "/images/gallery/12.png", alt: "Trança evento" },
-  { id: "g16", src: "/images/gallery/13.png", alt: "Arte Cachorro" },
-  { id: "g17", src: "/images/gallery/013.png", alt: "Croche de bolsas" },
-  { id: "g18", src: "/images/gallery/14.png", alt: "Corte feminino" },
-  { id: "g19", src: "/images/gallery/15.png", alt: "Trança elegante" },
-  { id: "g20", src: "/images/gallery/015.png", alt: "Croche vasos" },
-  { id: "g21", src: "/images/gallery/16.png", alt: "Penteado elegante para festa" },
-  { id: "g22", src: "/images/gallery/17.png", alt: "Bolsas de croche" }
-];
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { galleryImages as ITEMS } from "@/features/gallery/data/images";
 
 export function GalleryGrid() {
-  
-  const items = useMemo(() => ITEMS, []);
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-
-  const next = () => {
-    if (activeIndex === null) return;
-    setActiveIndex((prev) => (prev! + 1) % items.length);
-  };
-
-  const prev = () => {
-    if (activeIndex === null) return;
-    setActiveIndex((prev) => (prev! - 1 + items.length) % items.length);
-  };
-
+  const [active, setActive] = useState<number | null>(null);
+  const [outgoing, setOutgoing] = useState<number | null>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
+  const opener = useRef<HTMLButtonElement | null>(null);
+  const filmstrip = useRef<HTMLDivElement>(null);
+  const fadeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const grid = useRef<HTMLDivElement>(null);
+  const touchStart = useRef<number | null>(null);
+  const isOpen = active !== null;
   useEffect(() => {
-  if (activeIndex === null) return;
+    const element = grid.current;
+    if (!element || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-  const nextIndex = (activeIndex + 1) % items.length;
-  const prevIndex = (activeIndex - 1 + items.length) % items.length;
+    const tiles = Array.from(element.querySelectorAll<HTMLElement>(".gallery-tile"));
+    const animations = new Set<gsap.core.Tween>();
+    const revealed = new Set<HTMLElement>();
+    gsap.set(tiles, { autoAlpha: 0, y: 42, scale: 0.94 });
 
-  [items[nextIndex], items[prevIndex]].forEach((item) => {
-    const img = new window.Image();
-    img.src = item.src;
-  });
-}, [activeIndex, items]);
+    const reveal = (entering: HTMLElement[]) => {
+      entering.forEach((tile, order) => {
+        revealed.add(tile);
+        observer.unobserve(tile);
+        const tween = gsap.to(tile, {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.85,
+          delay: Math.min(order, 5) * 0.11,
+          ease: "power3.out",
+          clearProps: "transform,visibility,opacity",
+          onComplete: () => animations.delete(tween),
+        });
+        animations.add(tween);
+      });
+    };
+    const transitionActive = () => document.querySelector('.page-transition[data-active="true"]') !== null;
+    const observer = new IntersectionObserver((entries) => {
+      if (transitionActive()) return;
+      reveal(entries
+        .filter((entry) => entry.isIntersecting && !revealed.has(entry.target as HTMLElement))
+        .map((entry) => entry.target as HTMLElement)
+        .sort((a, b) => tiles.indexOf(a) - tiles.indexOf(b)));
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+    const onPageVisible = () => {
+      const viewport = window.innerHeight;
+      reveal(tiles.filter((tile) => {
+        const rect = tile.getBoundingClientRect();
+        return !revealed.has(tile) && rect.top < viewport * 0.92 && rect.bottom > 0;
+      }));
+    };
 
+    tiles.forEach((tile) => observer.observe(tile));
+    document.addEventListener("arlete:page-visible", onPageVisible);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("arlete:page-visible", onPageVisible);
+      animations.forEach((animation) => animation.kill());
+      gsap.set(tiles, { clearProps: "transform,visibility,opacity" });
+    };
+  }, []);
+  useEffect(() => {
+    if (!isOpen) return;
+    const element = dialog.current;
+    if (!element) return;
+    element.showModal();
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      if (element.open) element.close();
+      document.body.style.overflow = previous;
+      opener.current?.focus({ preventScroll: true });
+    };
+  }, [isOpen]);
+  useEffect(() => {
+    if (active === null) return;
+    const strip = filmstrip.current;
+    const thumb = strip?.querySelector<HTMLElement>(`[data-gallery-index="${active}"]`);
+    if (!strip || !thumb) return;
+    strip.scrollTo({
+      left: thumb.offsetLeft - (strip.clientWidth - thumb.clientWidth) / 2,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+    });
+  }, [active]);
+  useEffect(() => () => {
+    if (fadeTimer.current) clearTimeout(fadeTimer.current);
+  }, []);
+  const close = () => {
+    if (fadeTimer.current) clearTimeout(fadeTimer.current);
+    fadeTimer.current = null;
+    setOutgoing(null);
+    setActive(null);
+  };
+  const select = (index: number) => {
+    if (index === active) return;
+    const alreadyFading = fadeTimer.current !== null;
+    if (fadeTimer.current) clearTimeout(fadeTimer.current);
+    if (active !== null && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      if (!alreadyFading) setOutgoing(active);
+      fadeTimer.current = setTimeout(() => {
+        setOutgoing(null);
+        fadeTimer.current = null;
+      }, 320);
+    } else setOutgoing(null);
+    setActive(index);
+  };
+  const move = (direction: number) => {
+    if (active !== null) select((active + direction + ITEMS.length) % ITEMS.length);
+  };
+  const current = active === null ? null : ITEMS[active];
+  const number = (value: number) => String(value).padStart(2, "0");
   return (
     <>
-      <section className="w-full px-2 sm:px-6 py-4">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
-          {items.map((item, index) => (
-            <motion.div
-              key={item.id}
-              onClick={() => setActiveIndex(index)}
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.5,
-                delay: index * 0.03
-              }}
-              className="group relative w-full overflow-hidden rounded-[22px] cursor-pointer bg-[#edeae2] shadow-[0_10px_30px_rgba(47,45,45,0.10)]"
-            >
-              <div className="relative w-full aspect-4/5 sm:aspect-3/4">
-                <Image
-                  src={item.src}
-                  alt={item.alt}
-                  fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      <AnimatePresence>
-        {activeIndex !== null && (
-          <motion.div
-            className="fixed inset-0 z-999 bg-[#2f2d2d]/95 flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setActiveIndex(null)}
+      <div ref={grid} className="gallery-grid" data-reveal="none">
+        {ITEMS.map((item, index) => (
+          <Button
+            key={item.id}
+            className="gallery-tile"
+            animated={false}
+            variant="ghost"
+            aria-label={`Ver: ${item.alt}`}
+            onClick={(event) => { opener.current = event.currentTarget; select(index); }}
           >
-            <motion.div
-              className="relative flex items-center justify-center px-4"
-              onClick={(e) => e.stopPropagation()}
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              onDragEnd={(e, info) => {
-                if (info.offset.x < -80) next();
-                if (info.offset.x > 80) prev();
-              }}
-            >
-              <div className="relative">
-                <Image
-                  src={items[activeIndex].src}
-                  alt={items[activeIndex].alt}
-                  width={900}
-                  height={1200}
-                  priority
-                  loading="eager"
-                  className="max-h-[85vh] w-auto object-contain rounded-2xl"
-                  onClick={() => setActiveIndex(null)}
-                />
-
-                <button
-                  onClick={() => setActiveIndex(null)}
-                  className="absolute top-3 right-3 bg-black/40 backdrop-blur-md text-white w-9 h-9 rounded-full flex items-center justify-center"
-                >
-                  ✕
-                </button>
+            <Image
+              src={item.src}
+              alt={item.alt}
+              fill
+              sizes="(max-width: 640px) 45vw, (max-width: 1000px) 30vw, 23vw"
+            />
+            <ArrowCircle />
+          </Button>
+        ))}
+      </div>
+      <dialog
+        ref={dialog}
+        className="gallery-dialog"
+        aria-label="Visualização da galeria"
+        onClose={close}
+        onCancel={(event) => { event.preventDefault(); close(); }}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) close();
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowRight") { event.preventDefault(); move(1); }
+          if (event.key === "ArrowLeft") { event.preventDefault(); move(-1); }
+        }}
+      >
+        {current && (
+          <>
+            <header className="gallery-dialog-header">
+              <div className="gallery-dialog-context">
+                <span>GALERIA</span>
+                {current.category && <><span className="gallery-dialog-divider" aria-hidden="true" /><span>{current.category}</span></>}
               </div>
-            </motion.div>
-          </motion.div>
+              <Button className="gallery-close" size="icon" animated={false} aria-label="Fechar galeria" onClick={close}>
+                <X aria-hidden="true" />
+              </Button>
+            </header>
+            <div className="gallery-viewer">
+              <Button className="gallery-prev" variant="arrow" direction="left" aria-label="Fotografia anterior" onClick={() => move(-1)} />
+              <div
+                className="gallery-photo"
+                aria-live="polite"
+                aria-atomic="true"
+                onTouchStart={(event) => { touchStart.current = event.touches[0].clientX; }}
+                onTouchEnd={(event) => {
+                  if (touchStart.current === null) return;
+                  const delta = event.changedTouches[0].clientX - touchStart.current;
+                  if (Math.abs(delta) > 60) move(delta < 0 ? 1 : -1);
+                  touchStart.current = null;
+                }}
+              >
+                {outgoing !== null && (
+                  <div className="gallery-photo-layer gallery-photo-outgoing" aria-hidden="true">
+                    <Image src={ITEMS[outgoing].src} alt="" fill sizes="(max-width: 640px) 100vw, 80vw" />
+                  </div>
+                )}
+                <div className="gallery-photo-layer gallery-photo-current" key={current.id}>
+                  <Image src={current.src} alt={current.alt} fill sizes="(max-width: 640px) 100vw, 80vw" />
+                </div>
+              </div>
+              <Button className="gallery-next" variant="arrow" direction="right" aria-label="Fotografia seguinte" onClick={() => move(1)} />
+            </div>
+            <div className="gallery-dialog-caption">
+              <div>
+                <p className="gallery-caption-title">{current.alt}</p>
+                {current.category && <p className="gallery-caption-category">{current.category}</p>}
+              </div>
+              <p className="gallery-counter" aria-label={`Fotografia ${active! + 1} de ${ITEMS.length}`}>
+                <span>{number(active! + 1)}</span><span aria-hidden="true"> / </span><span>{number(ITEMS.length)}</span>
+              </p>
+            </div>
+            <div className="gallery-filmstrip" ref={filmstrip} aria-label="Escolher fotografia">
+              {ITEMS.map((item, index) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className="gallery-thumbnail"
+                  data-gallery-index={index}
+                  aria-label={`Ver fotografia ${index + 1}: ${item.alt}`}
+                  aria-current={index === active ? "true" : undefined}
+                  onClick={() => select(index)}
+                >
+                  <Image src={item.src} alt="" fill sizes="72px" />
+                </button>
+              ))}
+            </div>
+          </>
         )}
-      </AnimatePresence>
+      </dialog>
     </>
   );
 }

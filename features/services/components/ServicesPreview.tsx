@@ -1,4 +1,5 @@
 "use client";
+import { ArrowCircle } from "@/components/ui/button";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -111,9 +112,7 @@ function Card({ service }: any) {
           className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#5b5545]"
         >
           Ver detalhes
-          <span className="transition-transform duration-300 group-hover:translate-x-1">
-            →
-          </span>
+          <ArrowCircle />
         </Link>
       </div>
 
