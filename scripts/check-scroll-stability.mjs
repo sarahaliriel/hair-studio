@@ -58,7 +58,7 @@ const style = (metrics) => new Proxy({
   },
 });
 
-function mount({ height = 900, width = 1440, offset = 110, hash = "", reduced = false, implementation = "shared/ui/ArcScroll.tsx" } = {}) {
+function mount({ height = 900, width = 1440, offset = 110, hash = "", reduced = false, implementation = "shared/ui/ArcScroll.tsx", arcTargets = [] } = {}) {
   const metrics = { queries: 0, styleWrites: 0, attributeWrites: 0 };
   const frames = new Map();
   let sequence = 0;
@@ -68,7 +68,7 @@ function mount({ height = 900, width = 1440, offset = 110, hash = "", reduced = 
   const media = Object.assign(new Events(), { matches: reduced });
   window.matchMedia = () => media;
   const location = { hash };
-  const content = { style: style(metrics), inert: false, contains: (node) => node === focusedChild };
+  const content = { style: style(metrics), inert: false, contains: (node) => node === focusedChild, querySelectorAll: () => arcTargets };
   const focusedChild = {};
   const surface = { style: style(metrics), removeAttribute() { metrics.styleWrites++; this.style = style(metrics); } };
   const outgoing = { offsetHeight: 2000, offsetTop: 999, style: style(metrics), hasAttribute: () => true, offsetParent: null };
@@ -170,11 +170,11 @@ test("native progress settles immediately across large jumps and reversals", () 
   page.destroy();
 });
 
-test("exposure deadband resists small reversals and moves focus before hiding", () => {
+test("content exposure follows the covered arc and reverses with scroll", () => {
   const page = mount();
   const move = (progress) => page.scroll(2000 - 900 * (1 - progress));
   move(0.79);
-  assert.equal(page.content.inert, true);
+  assert.equal(page.content.inert, false);
   move(0.81);
   for (const progress of [0.799, 0.785, 0.805, 0.79]) {
     move(progress);
@@ -183,8 +183,25 @@ test("exposure deadband resists small reversals and moves focus before hiding", 
   page.document.activeElement = page.focusedChild;
   move(0.77);
   assert.equal(page.document.activeElement, page.section);
-  assert.equal(page.content.style.visibility, "hidden");
   assert.equal(page.content.inert, true);
+  page.destroy();
+});
+
+test("arc content opacity and position reverse from the same scroll progress", () => {
+  const target = { dataset: { reveal: "fadeUp" }, style: style(), parentElement: null };
+  const page = mount({ arcTargets: [target] });
+  const move = (progress) => page.scroll(2000 - 900 * (1 - progress));
+  move(0.78);
+  assert.equal(target.style.opacity, "0");
+  move(0.89);
+  const midpoint = [target.style.opacity, target.style.transform];
+  assert.ok(Number(midpoint[0]) > 0 && Number(midpoint[0]) < 1);
+  move(1);
+  assert.equal(target.style.opacity, "1");
+  move(0.89);
+  assert.deepEqual([target.style.opacity, target.style.transform], midpoint);
+  move(0.78);
+  assert.equal(target.style.opacity, "0");
   page.destroy();
 });
 
@@ -557,31 +574,37 @@ test("reviews server source handles success, empty, missing configuration and fa
   }
 });
 
-test("reviews render real data in initial HTML and reserve no empty or failed section", () => {
+test("reviews render real data without duplicate accessibility content or empty sections", () => {
   const { default: ReviewsSection } = load("features/reviews/components/ReviewsSection.tsx", {}, {
     "react/jsx-runtime": jsxRuntime,
-    "@/components/ui/button": {
-      ArrowCircle: () => createElement("span"),
-      Button: ({ children }) => createElement("a", null, children),
-    },
+    "@/components/ui/button": { Button: ({ children, render }) => createElement("a", { href: render.props.href }, children) },
   });
   for (const data of [{ ok: false }, { ok: true, reviews: [] }]) {
     assert.equal(renderToStaticMarkup(ReviewsSection({ data })), "");
   }
-  const html = renderToStaticMarkup(ReviewsSection({ data: {
-    ok: true, reviews: [{ text: "Test review fixture", authorName: "Test author", rating: 5 }],
-  } }));
-  assert.ok(html.includes("Test review fixture"));
-  assert.ok(html.includes("Test author"));
-  assert.ok(html.includes('id="avaliacoes"'));
+  for (const count of [1, 2, 3, 4, 5, 6]) {
+    const reviews = Array.from({ length: count }, (_, index) => ({
+      text: `Test review ${index}`, authorName: `Author ${index}`, rating: 5,
+    }));
+    const html = renderToStaticMarkup(ReviewsSection({ data: {
+      ok: true, reviews, place: { googleMapsUri: "https://maps.google.com/example" },
+    } }));
+    assert.ok(html.includes('id="avaliacoes"'));
+    assert.ok(html.includes("A beleza está nos"));
+    assert.equal(html.includes("review-row-animated"), count >= 2);
+    assert.equal((html.match(/class="review-row(?: review-row-reverse)?(?: review-row-animated)?"/g) ?? []).length, count >= 4 ? 2 : 1);
+    assert.ok(html.includes("https://maps.google.com/example"));
+    for (const review of reviews) assert.ok(html.includes(review.text));
+    if (count >= 2) assert.ok(html.includes('aria-hidden="true"'));
+  }
 });
 
 test("hero waits for visibility, settles restoration and never duplicates its entrance", () => {
   function mountHero({ covered = false, bottom = 800, motion = true } = {}) {
     const document = new Events();
     const state = { covered, motion };
-    document.querySelector = () => state.covered ? {} : null;
-    const stage = { querySelectorAll: () => [], getBoundingClientRect: () => ({ bottom }) };
+    document.querySelector = (selector) => selector === '.page-transition[data-active="true"]' && state.covered ? {} : null;
+    const stage = { dataset: {}, querySelectorAll: () => [], getBoundingClientRect: () => ({ bottom }) };
     const entered = { current: false };
     const timelines = [];
     let cleanup, mediaCleanup, mediaCallback;

@@ -126,7 +126,7 @@ export function Reveal() {
           }
         });
         document.querySelectorAll<HTMLElement>(revealTargets).forEach((element) => {
-          if (records.has(element) || element.closest('[data-reveal="none"], dialog, [data-image-trail]')) return;
+          if (records.has(element) || element.closest('[data-reveal="none"], [data-arc-content], dialog, [data-image-trail]')) return;
           // Only children enter: the arc's section, surface and content container
           // retain exclusive ownership of the section transition.
           const arc = element.closest<HTMLElement>("[data-arc-scroll]");

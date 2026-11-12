@@ -1,7 +1,7 @@
 "use client";
 
 import { useLayoutEffect } from "react";
-import { ARC_COVERED, contentExposed, sceneProgress } from "./scroll-scene";
+import { ARC_COVERED, sceneProgress } from "./scroll-scene";
 
 /** Reveal the real incoming surfaces, with no clones, spacers or scroll interception. */
 export function ArcScrollReveal() {
@@ -28,12 +28,19 @@ export function ArcScrollReveal() {
     let previousHash: string | undefined;
     // Stable references survive geometry invalidation. No descendant queries in
     // scroll frames, visibility changes, or completed-scene cleanup.
-    const geometry = sections.map((section) => ({
-      section, top: 0,
-      surface: section.querySelector<HTMLElement>("[data-arc-surface]")!,
-      content: section.querySelector<HTMLElement>("[data-arc-content]"),
-      cleared: false, active: false, q: -1, display: "", path: "",
-    }));
+    const geometry = sections.map((section) => {
+      const content = section.querySelector<HTMLElement>("[data-arc-content]");
+      const groups = Array.from(content?.querySelectorAll<HTMLElement>("[data-reveal]") ?? [])
+        .filter((element) => !element.parentElement?.closest("[data-reveal]"));
+      const targets = groups.flatMap((element) => element.dataset.reveal === "stagger"
+        ? Array.from(element.children).filter((child): child is HTMLElement => child instanceof HTMLElement)
+        : [element]);
+      return {
+        section, top: 0, content, targets, contentProgress: -1,
+        surface: section.querySelector<HTMLElement>("[data-arc-surface]")!,
+        cleared: false, active: false, q: -1, display: "", path: "",
+      };
+    });
     type Scene = (typeof geometry)[number];
     const stickySizes = outgoing.map(() => ({ height: -1, viewport: -1 }));
     const previousTabIndex = new Map<HTMLElement, string | null>();
@@ -49,10 +56,7 @@ export function ArcScrollReveal() {
         section.tabIndex = -1;
         section.focus({ preventScroll: true });
       }
-      if (content) {
-        content.style.visibility = visible ? "visible" : "hidden";
-        content.inert = !visible;
-      }
+      if (content) content.inert = !visible;
       section.dataset.arcContentVisible = value;
       section.dispatchEvent(new Event("arlete:arc-content-visible", { bubbles: true }));
     };
@@ -61,14 +65,27 @@ export function ArcScrollReveal() {
       if (item.cleared && notify) return;
       const { section, content, surface } = item;
       section.removeAttribute("data-arc-active");
-      content?.style.removeProperty("visibility");
       if (content) content.inert = false;
       surface.removeAttribute("style");
       item.cleared = true;
       item.active = false;
       item.q = -1;
       item.display = item.path = "";
+      renderContent(item, 1);
       if (notify) setContentVisible(item, true);
+    };
+
+    const renderContent = (item: Scene, progress: number) => {
+      if (item.contentProgress === progress) return;
+      item.contentProgress = progress;
+      const last = Math.max(1, item.targets.length - 1);
+      item.targets.forEach((element, index) => {
+        const start = 0.42 * index / last;
+        const local = Math.max(0, Math.min(1, (progress - start) / 0.58));
+        const eased = 1 - (1 - local) ** 3;
+        element.style.opacity = String(eased);
+        element.style.transform = `translate3d(0, ${Math.round((1 - eased) * 36 * 100) / 100}px, 0)`;
+      });
     };
 
     const tick = () => {
@@ -168,8 +185,9 @@ export function ArcScrollReveal() {
           item.q = q;
         }
         if (item.content) {
-          const entering = contentExposed(p, item.section.dataset.arcContentVisible === "true");
-          setContentVisible(item, entering);
+          const entrance = Math.max(0, Math.min(1, (p - ARC_COVERED) / (1 - ARC_COVERED)));
+          renderContent(item, entrance);
+          setContentVisible(item, entrance > 0);
         }
       });
       document.dispatchEvent(new Event("arlete:scene-update"));
@@ -220,6 +238,10 @@ export function ArcScrollReveal() {
       geometry.forEach((item) => {
         const { section } = item;
         clear(item, false);
+        item.targets.forEach((element) => {
+          element.style.removeProperty("opacity");
+          element.style.removeProperty("transform");
+        });
         delete section.dataset.arcContentVisible;
         section.style.removeProperty("--arc-background");
         if (previousTabIndex.has(section)) {

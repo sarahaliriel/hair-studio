@@ -7,6 +7,10 @@ import styles from "./RotatingImageTrail.module.css";
 
 type Props = { images: readonly { src: string }[] };
 
+const COOLDOWN_MS = 700;
+const MIN_DISTANCE_PX = 120;
+const MAX_PHOTOS = 3;
+
 /** Adapted from the supplied effect for the homepage hero. */
 export function RotatingImageTrail({ images }: Props) {
   const layerRef = useRef<HTMLDivElement>(null);
@@ -24,7 +28,6 @@ export function RotatingImageTrail({ images }: Props) {
     );
     const decoding = new Map<string, Promise<void>>();
     const active = new Map<HTMLImageElement, gsap.core.Timeline>();
-    const maxPhotos = 16;
     let disposed = false;
     let bounds: DOMRect | null = null;
     let boundsDirty = true;
@@ -34,6 +37,7 @@ export function RotatingImageTrail({ images }: Props) {
     let accumulatedDistance = 0;
     let imageIndex = 0;
     let inViewport = false;
+    let lastPhotoAt = -Infinity;
 
     const enabled = () =>
       inViewport && finePointer.matches && !reducedMotion.matches && !document.hidden;
@@ -52,14 +56,14 @@ export function RotatingImageTrail({ images }: Props) {
     };
 
     const createPhoto = (x: number, y: number, deltaX: number) => {
-      if (!bounds || y > bounds.height - 160 || active.size >= maxPhotos) return;
+      if (!bounds || y > bounds.height - 160 || active.size >= MAX_PHOTOS) return false;
       // A failed source must not block the other decoded photographs.
       let checked = 0;
       while (checked < sources.length && !loadedSources.has(sources[imageIndex])) {
         imageIndex = (imageIndex + 1) % sources.length;
         checked++;
       }
-      if (checked === sources.length) return;
+      if (checked === sources.length) return false;
       const source = sources[imageIndex];
       imageIndex = (imageIndex + 1) % images.length;
 
@@ -68,6 +72,7 @@ export function RotatingImageTrail({ images }: Props) {
       photo.src = source;
       photo.alt = "";
       photo.draggable = false;
+      photo.style.opacity = "0";
       layer.appendChild(photo);
 
       const initialRotation = (Math.random() - 0.5) * 20;
@@ -118,6 +123,9 @@ export function RotatingImageTrail({ images }: Props) {
           duration: 0.3,
           ease: `back.in(${1.5 + (1 - y / bounds.height)})`,
         }, "<");
+      timeline.to(photo, { opacity: 1, duration: 0.2, ease: "power1.out" }, 0);
+      timeline.to(photo, { opacity: 0, duration: 0.5, ease: "power1.inOut" }, 0.4);
+      return true;
     };
 
     const flush = () => {
@@ -129,9 +137,12 @@ export function RotatingImageTrail({ images }: Props) {
       }
       const point = pending;
       pending = undefined;
-      if (accumulatedDistance >= bounds.width / 8) {
+      if (accumulatedDistance >= MIN_DISTANCE_PX) {
         accumulatedDistance = 0;
-        createPhoto(point.x - bounds.left, point.y - bounds.top, point.deltaX);
+        if (performance.now() - lastPhotoAt >= COOLDOWN_MS &&
+          createPhoto(point.x - bounds.left, point.y - bounds.top, point.deltaX)) {
+          lastPhotoAt = performance.now();
+        }
       }
     };
     const move = (event: PointerEvent) => {
@@ -139,11 +150,13 @@ export function RotatingImageTrail({ images }: Props) {
       const x = event.clientX;
       const y = event.clientY;
       const deltaX = previous ? x - previous.x : 0;
-      if (previous) accumulatedDistance += Math.abs(deltaX) + Math.abs(y - previous.y);
+      const coolingDown = performance.now() - lastPhotoAt < COOLDOWN_MS;
+      if (coolingDown) accumulatedDistance = 0;
+      else if (previous) accumulatedDistance += Math.abs(deltaX) + Math.abs(y - previous.y);
       previous = { x, y };
       pending = { x, y, deltaX };
       // Keep native event distance, but create at most one photograph per frame.
-      if (!frame && (boundsDirty || !bounds || accumulatedDistance >= bounds.width / 8)) frame = requestAnimationFrame(flush);
+      if (!frame && !coolingDown && (boundsDirty || !bounds || accumulatedDistance >= MIN_DISTANCE_PX)) frame = requestAnimationFrame(flush);
     };
     const resetPointer = () => {
       previous = undefined;

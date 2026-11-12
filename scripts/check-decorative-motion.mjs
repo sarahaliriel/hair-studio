@@ -34,6 +34,7 @@ class Events {
 
 function mountTrail({ fine = true, reduced = false } = {}) {
   let cleanup, intersection, disconnected = false, sequence = 0, reads = 0;
+  let now = 0;
   let bounds = { top: 100, left: 0, width: 800, height: 700 };
   const frames = new Map(), timelines = [], decodes = [];
   const document = Object.assign(new Events(), { hidden: false });
@@ -46,7 +47,7 @@ function mountTrail({ fine = true, reduced = false } = {}) {
     appendChild(photo) { this.children.push(photo); },
     replaceChildren() { this.children.length = 0; },
   };
-  document.createElement = () => ({
+  document.createElement = () => ({ style: {},
     remove() { const index = layer.children.indexOf(this); if (index !== -1) layer.children.splice(index, 1); },
   });
   class PreloadImage {
@@ -70,7 +71,7 @@ function mountTrail({ fine = true, reduced = false } = {}) {
     },
   };
   const { RotatingImageTrail } = load("shared/ui/RotatingImageTrail.tsx", {
-    document, window, Image: PreloadImage,
+    document, window, Image: PreloadImage, performance: { now: () => now },
     matchMedia: (query) => query.includes("reduce") ? reducedMotion : finePointer,
     requestAnimationFrame: (callback) => { frames.set(++sequence, callback); return sequence; },
     cancelAnimationFrame: (id) => frames.delete(id),
@@ -85,6 +86,7 @@ function mountTrail({ fine = true, reduced = false } = {}) {
   return {
     document, window, hero, finePointer, reducedMotion, frames, timelines, decodes, layer, element,
     get reads() { return reads; },
+    advance(ms) { now += ms; },
     set bounds(value) { bounds = { ...bounds, ...value }; },
     visible(value) { intersection([{ isIntersecting: value }]); },
     move(x, y = 200, pointerType = "mouse") { hero.emit("pointermove", { clientX: x, clientY: y, pointerType }); },
@@ -132,10 +134,47 @@ test("trail deduplicates pending decodes and coalesces burst input into one fram
   page.flush();
   assert.equal(page.reads, 1);
   assert.equal(page.timelines.length, 1);
-  assert.deepEqual(page.timelines[0].steps.map((step) => step.duration), [0.4, 0.4, 0.4, 0.3, 0.3]);
+  assert.deepEqual(page.timelines[0].steps.map((step) => step.duration), [0.4, 0.4, 0.4, 0.3, 0.3, 0.2, 0.5]);
+  assert.equal(page.timelines[0].photo.style.opacity, "0");
+  assert.equal(page.timelines[0].steps.at(-2).opacity, 1);
+  assert.equal(page.timelines[0].steps.at(-1).opacity, 0);
   page.visible(false);
   page.visible(true);
   assert.equal(page.decodes.length, 3, "decoded sources are reused");
+  page.destroy();
+});
+
+test("trail requires 120px and 700ms together without banking cooldown movement", async () => {
+  const page = mountTrail();
+  page.visible(true);
+  await page.decoded();
+  page.move(100);
+  page.move(219);
+  page.flush();
+  assert.equal(page.timelines.length, 0);
+  page.move(220);
+  page.flush();
+  assert.equal(page.timelines.length, 1, "first image has no initial cooldown");
+
+  for (let index = 0; index < 20; index++) {
+    page.move(index % 2 ? 100 : 400);
+    page.flush();
+  }
+  assert.equal(page.timelines.length, 1);
+  assert.equal(page.frames.size, 0);
+  page.advance(699);
+  page.move(400);
+  page.flush();
+  assert.equal(page.timelines.length, 1);
+  page.advance(1);
+  page.flush();
+  assert.equal(page.timelines.length, 1, "cooldown expiry does not create a queued image");
+  page.move(450);
+  page.flush();
+  assert.equal(page.timelines.length, 1);
+  page.move(520);
+  page.flush();
+  assert.equal(page.timelines.length, 2);
   page.destroy();
 });
 
@@ -149,6 +188,7 @@ test("trail refreshes its coordinate frame after scrolling without another scrol
   assert.equal(page.timelines[0].initial.y, 100);
   page.bounds = { top: -100 };
   page.document.emit("arlete:scene-update");
+  page.advance(700);
   page.move(100);
   page.move(250);
   page.flush();
@@ -164,13 +204,14 @@ test("trail bounds concurrency, removes completed photos and stops inactive time
   await page.decoded();
   page.move(100);
   for (let index = 0; index < 60; index++) {
+    page.advance(700);
     page.move(index % 2 ? 100 : 400);
     page.flush();
-    assert.ok(page.layer.children.length <= 16);
+    assert.ok(page.layer.children.length <= 3);
   }
-  assert.equal(page.layer.children.length, 16);
+  assert.equal(page.layer.children.length, 3);
   page.timelines[0].options.onComplete();
-  assert.equal(page.layer.children.length, 15);
+  assert.equal(page.layer.children.length, 2);
   page.visible(false);
   assert.equal(page.layer.children.length, 0);
   assert.ok(page.timelines.every((timeline) => timeline.killed));
@@ -190,6 +231,7 @@ test("trail responds to live capability/tab changes and late decode completion a
   assert.equal(page.layer.children.length, 0);
   page.document.hidden = false;
   page.document.emit("visibilitychange");
+  page.advance(700);
   page.move(100); page.move(400); page.flush();
   page.reducedMotion.matches = true;
   page.reducedMotion.emit("change");
