@@ -10,7 +10,7 @@ export function SectionTitle({
   as?: "h1" | "h2";
 }) {
   return (
-    <div className="mb-6" data-reveal="stagger">
+    <div className="section-title-menu mb-8" data-reveal="stagger" data-reveal-start="top 88%" data-reveal-exit="none">
       {overline ? (
         <div className="flex items-center gap-3">
           <span className="h-1.5 w-1.5 rounded-full bg-[#875f46]" />
@@ -23,13 +23,13 @@ export function SectionTitle({
         className={
           Heading === "h1"
             ? "page-heading"
-            : "font-serif mt-3 text-3xl leading-tight tracking-[-0.02em] text-[#2f2d2d] sm:text-4xl"
+            : "font-serif !mt-5 !mb-0 !text-[clamp(36px,4.5vw,64px)] !leading-[1.12] tracking-[-0.02em] text-[#2f2d2d]"
         }
       >
         {title}
       </Heading>
       {desc ? (
-        <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-[#2f2d2d]/70">
+        <p className="!mt-5 max-w-2xl text-[15px] leading-relaxed text-[#2f2d2d]/70">
           {desc}
         </p>
       ) : null}

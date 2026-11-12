@@ -1,7 +1,7 @@
 .frame {
   height: 100svh;
   padding: clamp(12px, 1.4vw, 24px);
-  background: var(--bg);
+  background: #ece4db;
 }
 .footer {
   position: relative;
@@ -135,24 +135,6 @@
   opacity: 1;
   transform: translateX(0);
   pointer-events: auto;
-}
-.footer :global(.site-button-label),
-.footer :global(.site-button-arrow.site-button-arrow) {
-  background: var(--nude);
-  color: var(--wine);
-}
-.footer :global(.site-button:is(:hover, :focus-visible)) :global(.site-button-label),
-.footer :global(.site-button:is(:hover, :focus-visible)) :global(.site-button-arrow) {
-  background: var(--bg);
-  color: var(--wine);
-}
-.footer :global(.site-button.site-button-secondary[data-slot="button"]) {
-  color: var(--bg);
-  border-color: #e1cfc399;
-}
-.footer :global(.site-button.site-button-secondary:is(:hover, :focus-visible)) {
-  color: var(--nude);
-  border-color: var(--bg);
 }
 @media (min-width: 1001px) and (max-width: 1250px) {
   .column { font-size: 15px; }

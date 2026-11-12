@@ -2,7 +2,7 @@ import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { site } from "@/config/Site";
-import { BookingLink, bookingHref } from "./BookingLink";
+import { bookingHref } from "./BookingLink";
 import { GravityPlayground } from "./gravity-footer/GravityPlayground";
 import { salonTools } from "./gravity-footer/assets";
 import styles from "./Footer.module.css";
@@ -20,7 +20,9 @@ export function Footer() {
           <p className={styles.name}>{site.name}</p>
           <p className={styles.description}>Cuidados e finalização com produtos de alta qualidade.</p>
           <p className={styles.hours}>TERÇA A SEXTA · 09:00 ÀS 18:00</p>
-          <BookingLink>Marcar no WhatsApp</BookingLink>
+          <Button variant="inverse" render={<a href={bookingHref} target="_blank" rel="noopener noreferrer" />}>
+            Marcar no WhatsApp
+          </Button>
         </div>
         <nav className={styles.column} aria-label="Navegação do rodapé">
           <p className={styles.label}>EXPLORA</p>
@@ -49,7 +51,7 @@ export function Footer() {
         <div className={`${styles.column} ${styles.location}`}>
           <p className={styles.label}>MORADA</p>
           <p>{site.addressLine}</p>
-          <Button variant="secondary" render={<a href="https://www.google.com/maps/search/?api=1&query=Ideias+e+Tran%C3%A7as+R.+Silva+Carvalho+54B+Lisboa" target="_blank" rel="noopener noreferrer" />}>
+          <Button variant="inverse-outline" render={<a href="https://www.google.com/maps/search/?api=1&query=Ideias+e+Tran%C3%A7as+R.+Silva+Carvalho+54B+Lisboa" target="_blank" rel="noopener noreferrer" />}>
             Ver no mapa
           </Button>
         </div>

@@ -49,7 +49,7 @@ export function Navbar() {
               </Link>
             ))}
           </nav>
-          <Button render={<a
+          <Button className="navbar-booking" render={<a
             href={bookingHref}
             target="_blank"
             rel="noopener noreferrer"
@@ -82,7 +82,7 @@ export function Navbar() {
                 {item.label}
               </Link>
             ))}
-            <Button render={<a
+            <Button variant="inverse" render={<a
               href={bookingHref}
               target="_blank"
               rel="noopener noreferrer"

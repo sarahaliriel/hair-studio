@@ -32,6 +32,8 @@ const buttonVariants = cva(
         link: "border-transparent underline-offset-4 [:hover,[data-pressed]]:underline",
         outline: "border-input bg-background not-dark:bg-clip-padding text-foreground shadow-xs/5 not-disabled:not-active:not-data-pressed:before:shadow-[0_1px_--theme(--color-black/6%)] dark:bg-input/32 dark:not-disabled:before:shadow-[0_-1px_--theme(--color-white/2%)] dark:not-disabled:not-active:not-data-pressed:before:shadow-[0_-1px_--theme(--color-white/6%)] [:disabled,:active,[data-pressed]]:shadow-none [:hover,[data-pressed]]:bg-accent/50 dark:[:hover,[data-pressed]]:bg-input/64",
         secondary: "border-transparent bg-transparent text-primary",
+        inverse: "border-transparent bg-transparent text-primary",
+        "inverse-outline": "border-transparent bg-transparent text-primary",
         arrow: "border-transparent bg-transparent text-primary",
       },
     },
@@ -61,11 +63,12 @@ function ArrowCircle({ className, direction = "up-right" }: {
 
 function Button({ className, variant, size, render, animated = !size?.startsWith("icon"), direction, children, ...props }: ButtonProps) {
   const isArrow = variant === "arrow";
-  const isSecondary = variant === "secondary" || variant === "outline";
-  const styled = animated || isArrow;
+  const isInverse = variant === "inverse" || variant === "inverse-outline";
+  const isSecondary = variant === "secondary" || variant === "outline" || variant === "inverse-outline";
+  const styled = animated || isArrow || isInverse;
   const typeValue: React.ButtonHTMLAttributes<HTMLButtonElement>["type"] = render ? undefined : "button";
   const defaultProps = {
-    className: cn(buttonVariants({ size, variant }), styled && "site-button", styled && isSecondary && "site-button-secondary", isArrow && "site-button-icon", className),
+    className: cn(buttonVariants({ size, variant }), styled && "site-button", styled && !animated && isInverse && "site-button-static", styled && isSecondary && "site-button-secondary", styled && variant === "inverse" && "site-button-inverse", styled && variant === "inverse-outline" && "site-button-inverse-outline", isArrow && "site-button-icon", className),
     children: isArrow ? <ArrowCircle direction={direction} /> : animated ? (
       isSecondary ? (
         <span className="site-button-text-mask">
