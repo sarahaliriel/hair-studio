@@ -1,0 +1,21 @@
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  contain: layout paint;
+}
+.photo {
+  position: absolute;
+  display: block;
+  max-width: none;
+  width: clamp(128px, 15vw, 220px);
+  height: clamp(128px, 15vw, 220px);
+  object-fit: cover;
+  border-radius: 4%;
+  box-shadow: 0 8px 24px rgb(45 29 25 / 14%);
+}
+@media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
+  .layer { display: none; }
+}
