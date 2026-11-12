@@ -2,6 +2,7 @@ import { Button, ArrowCircle } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { Hero } from "@/features/home/components/Hero";
+import { HomeIntro } from "@/features/home/components/HomeIntro";
 import { BrandsMarquee } from "@/features/home/components/BrandsMarquee";
 import { ExpandingSpaceSection } from "@/features/home/components/ExpandingSpaceSection";
 import { BookingLink } from "@/shared/ui/BookingLink";
@@ -10,35 +11,36 @@ import { ArcScrollReveal } from "@/shared/ui/ArcScroll";
 import { getGoogleReviews } from "@/features/reviews/data/google-reviews";
 import ReviewsSection from "@/features/reviews/components/ReviewsSection";
 import { site } from "@/config/Site";
+const experienceWhatsAppHref = `https://wa.me/${site.whatsappRaw}?text=${encodeURIComponent("Olá, Arlete! Gostaria de saber mais sobre os serviços e combinar um atendimento.")}`;
 export const revalidate = 3600;
 
 const services = [
   {
     name: "Tranças & identidade",
+    category: "penteados",
     image: "/images/services/tranças.png",
     description:
       "Box braids com atenção ao acabamento e orientação para a manutenção.",
-    number: "01",
   },
   {
     name: "Cor & luminosidade",
+    category: "coloracao",
     image: "/images/services/coloracao.jpg",
     description: "Coloração, balayage e madeixas pensadas para o teu cabelo.",
-    number: "02",
   },
   {
     name: "Corte & movimento",
+    category: "cabelo",
     image: "/images/services/corte.png",
     description:
       "Cortes femininos, masculinos e infantis, adaptados a cada rosto e rotina.",
-    number: "03",
   },
   {
     name: "Penteados & ocasiões",
+    category: "penteados",
     image: "/images/services/penteado.png",
     description:
       "Da tua inspiração ao penteado para um dia especial, incluindo noivas.",
-    number: "04",
   },
 ];
 export default async function HomePage() {
@@ -46,6 +48,7 @@ export default async function HomePage() {
   const { body: reviews } = await getGoogleReviews();
   return (
     <>
+      <HomeIntro />
       <ArcScrollScene
         incoming={
           <section
@@ -56,7 +59,6 @@ export default async function HomePage() {
             <span data-arc-surface aria-hidden="true" />
             <div data-arc-content>
               <span id="contacto" />
-              <span className="eyebrow" data-reveal="fadeUp" data-reveal-start="clamp(top 76%)">05 / O TEU MOMENTO</span>
               <div className="booking-layout">
                 <div>
                   <h2 data-reveal="maskedText" data-reveal-start="clamp(top 76%)">
@@ -78,7 +80,7 @@ export default async function HomePage() {
                   </a>
                 </div>
                 <div className="location-card">
-                  <span className="eyebrow" data-reveal="fadeUp" data-reveal-start="clamp(top 76%)">À TUA ESPERA EM LISBOA</span>
+                  <span className="location-divider" data-reveal="fadeUp" aria-hidden="true" />
                   <h3 data-reveal="maskedText" data-reveal-start="clamp(top 76%)">Campo de Ourique</h3>
                   <p data-reveal="fadeUp" data-reveal-start="clamp(top 76%)">{site.addressLine}</p>
                   <p data-reveal="fadeUp" data-reveal-start="clamp(top 76%)">
@@ -121,7 +123,6 @@ export default async function HomePage() {
               <div data-arc-content>
                 <div className="section-heading">
                   <div data-reveal="stagger" data-reveal-start="clamp(top 76%)">
-                    <p className="eyebrow">02 / SERVIÇOS</p>
                     <h2>
                       O teu próximo
                       <br />
@@ -130,10 +131,9 @@ export default async function HomePage() {
                   </div>
                   <div data-reveal="stagger" data-reveal-start="clamp(top 76%)">
                     <p>
-                      Um novo tom. Um novo corte. Ou simplesmente
-                      <br />o cuidado de que o teu cabelo precisa.
+                      Descobre os serviços pensados para cuidar de ti, respeitar o teu estilo e valorizar a tua beleza.
                     </p>
-                    <Button variant="secondary" render={<Link href="/servicos" />}>
+                    <Button variant="secondary" render={<Link href="/servicos#servicos-list" />}>
                       Todos os serviços e valores{" "}
                     </Button>
                   </div>
@@ -141,8 +141,8 @@ export default async function HomePage() {
                 <div className="service-grid">
                   {services.map((s) => (
                     <Link
-                      href="/servicos"
-                      key={s.number}
+                      href={`/servicos?categoria=${s.category}#servicos-list`}
+                      key={s.name}
                       className="editorial-service"
                       data-reveal="fadeUp" data-reveal-start="clamp(top 76%)"
                     >
@@ -153,7 +153,6 @@ export default async function HomePage() {
                           fill
                           sizes="(max-width: 600px) 90vw, (max-width: 1000px) 45vw, 23vw"
                         />
-                        <span className="service-number">{s.number}</span>
                         <ArrowCircle className="service-arrow" />
                       </div>
                       <h3>{s.name}</h3>
@@ -173,59 +172,41 @@ export default async function HomePage() {
           </div>
           <ExpandingSpaceSection />
         </ArcScrollScene>
-        <section className="care-section">
-          <div className="care-inner">
-            <div data-reveal="stagger" data-reveal-start="clamp(top 76%)">
-              <p className="eyebrow">03 / A NOSSA FORMA DE CUIDAR</p>
-              <h2>
-                O detalhe faz
-                <br />
-                <em>a diferença.</em>
-              </h2>
-            </div>
-            <div className="care-list">
+        <section className="care-section" aria-labelledby="care-title">
+          <div className="care-shell">
+            <header className="care-intro">
+              <div className="care-heading">
+                <h2 id="care-title" data-reveal="fadeUp" data-reveal-start="clamp(top 76%)">
+                  Da tua ideia ao <em>resultado.</em>
+                </h2>
+                <p>Três passos simples para encontrares o cuidado certo para ti.</p>
+              </div>
+            </header>
+            <ol className="care-steps">
               {[
-                [
-                  "01",
-                  "Um cuidado individual",
-                  "O teu rosto, o teu cabelo e a tua rotina orientam cada escolha.",
-                ],
-                [
-                  "02",
-                  "Da inspiração à finalização",
-                  "Partilha uma referência e conversamos sobre o resultado que procuras.",
-                ],
-                [
-                  "03",
-                  "Perto de ti",
-                  "No salão em Campo de Ourique ou ao domicílio em Lisboa, sob marcação.",
-                ],
-              ].map(([n, t, d]) => (
-                <div key={n} data-reveal="fadeUp" data-reveal-start="clamp(top 76%)">
-                  <span>{n}</span>
+                ["Conta-nos o que procuras", "Partilha a tua ideia ou uma fotografia de inspiração."],
+                ["Escolhemos juntas", "Conversamos sobre o teu cabelo e as opções mais adequadas."],
+                ["Combinamos o teu atendimento", "Definimos o serviço, a disponibilidade e o local."],
+              ].map(([title, description], index) => (
+                <li key={title}>
+                  <span className="care-step-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
                   <div>
-                    <h3>{t}</h3>
-                    <p>{d}</p>
+                    <h3>{title}</h3>
+                    <p>{description}</p>
                   </div>
-                  <ArrowCircle />
-                </div>
+                </li>
               ))}
+            </ol>
+            <div className="care-footer">
+              <Button variant="inverse" className="care-cta" render={<a href={experienceWhatsAppHref} target="_blank" rel="noopener noreferrer" aria-label="Falar com a Arlete no WhatsApp (abre numa nova janela)" />}>
+                Falar com a Arlete
+              </Button>
             </div>
-          </div>
-          <div className="care-art" data-reveal="imageReveal" data-reveal-start="clamp(top 76%)">
-            <Image
-              src="/images/services/penteado.png"
-              alt="Detalhe de um penteado elaborado pela Arlete"
-              fill
-              sizes="(max-width: 760px) 100vw, 45vw"
-            />
-            <span>O TEU ESTILO, EM CADA DETALHE.</span>
           </div>
         </section>
         <section className="portfolio-section section-wrap">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">04 / PELAS MÃOS DA ARLETE</p>
               <h2>
                 Cabelos reais.
                 <br />
@@ -234,9 +215,7 @@ export default async function HomePage() {
             </div>
             <div>
               <p>
-                Uma seleção de trabalhos.
-                <br />
-                Cada pessoa, uma nova inspiração.
+                Uma seleção de trabalhos. Cada pessoa, uma nova inspiração.
               </p>
               <Button variant="secondary" render={<Link href="/galeria" />}>
                 Explorar a galeria

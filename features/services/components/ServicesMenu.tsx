@@ -24,9 +24,9 @@ function waLink(serviceName: string) {
   return `https://wa.me/${site.whatsappRaw}?text=${text}`;
 }
 
-export function ServicesMenu() {
+export function ServicesMenu({ initialCategory }: { initialCategory?: string }) {
   const [active, setActive] = useState<ServiceCategoryKey>(
-    serviceCategories[0]?.key ?? "coloracao",
+    serviceCategories.find((item) => item.key === initialCategory)?.key ?? serviceCategories[0]?.key ?? "coloracao",
   );
   const [q, setQ] = useState("");
 
@@ -40,9 +40,9 @@ export function ServicesMenu() {
   }, [active, q]);
 
   return (
-    <section className="mt-8">
-      <div className="rounded-[28px] border border-black/10 bg-white/40 p-3 backdrop-blur">
-        <div className="flex gap-2 overflow-x-auto px-1 py-1 [-webkit-overflow-scrolling:touch]">
+    <section id="servicos-list" className="mt-8 scroll-mt-28">
+      <div className="rounded-[28px] border border-black/10 bg-white/40 p-3 backdrop-blur" data-reveal="fadeUp" data-reveal-exit="none">
+        <div className="flex flex-wrap gap-2 px-1 py-1">
           {serviceCategories.map((c) => {
             const on = c.key === active;
             return (
@@ -60,7 +60,7 @@ export function ServicesMenu() {
         </div>
 
         <div className="mt-3 px-1">
-          <div className="flex items-center gap-2 rounded-full border border-black/10 bg-[#edeae2]/60 px-4 py-3">
+          <div className="service-search flex items-center gap-2 rounded-full border border-black/10 bg-[#edeae2]/60 px-4 py-3">
             <span className="text-black/45">⌕</span>
             <input
               value={q}
@@ -87,8 +87,8 @@ export function ServicesMenu() {
         {visible.length ? (
           <ul className="divide-y divide-black/10">
             {visible.map((s) => (
-              <li data-reveal="fadeUp" key={s.id} className="p-4 sm:p-5">
-                <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+              <li data-reveal="fadeUp" data-reveal-start="top 88%" data-reveal-exit="none" key={s.id} className="p-6 sm:px-8 sm:py-7">
+                <div className="grid gap-5 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-8">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="font-serif text-[18px] leading-tight text-[#2f2d2d]">
@@ -115,7 +115,7 @@ export function ServicesMenu() {
                       target="_blank"
                       rel="noreferrer"
                      />}>
-                      MARCAR
+                      Marcar
                     </Button>
                   </div>
                 </div>

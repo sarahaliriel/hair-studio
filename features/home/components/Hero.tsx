@@ -37,6 +37,7 @@ export function Hero() {
       // Start the hero then, so its entrance is not consumed behind the wipe.
       const cancelReady = whenPageVisible(() => {
         entered.current = true;
+        stage.dataset.heroEntranceStarted = "true";
         // A restored page below the hero should not consume an entrance offscreen.
         if (stage.getBoundingClientRect().bottom <= 0) timeline.progress(1);
         else timeline.play();
@@ -67,7 +68,6 @@ export function Hero() {
             </div>
           </div>
         </div>
-        <a className="hero-scroll-note" href="#sobre" data-hero-support>DESLIZA PARA VER MAIS <span aria-hidden="true">↓</span></a>
       </div>
     </section>
   );

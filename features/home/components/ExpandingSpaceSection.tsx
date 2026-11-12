@@ -31,7 +31,7 @@ export function ExpandingSpaceSection() {
           trigger: section,
           start: "top top",
           end: "+=360%",
-          scrub: 0.35,
+          scrub: true,
           pin: true,
           invalidateOnRefresh: true,
         },
@@ -52,19 +52,26 @@ export function ExpandingSpaceSection() {
           <Image src="/images/editorial/coloracao-liso.webp" alt="Modelo de costas com cabelo liso castanho iluminado" fill sizes="100vw" />
           <div className="space-expansion-shade" data-space-shade aria-hidden="true" />
           <div className="space-expansion-content" data-space-content>
-            <div className="space-expansion-caption">
-              <span className="eyebrow" data-space-reveal>01 / O ESPAÇO</span>
-              <span className="space-expansion-star" data-space-reveal aria-hidden="true">✳</span>
-              <p data-space-reveal>Mais do que um novo look.<br />Um momento só teu.</p>
-            </div>
-            <div className="space-expansion-copy">
-              <h2 data-space-reveal>O cuidado começa<br />por <em>te ouvir.</em></h2>
-              <div className="space-expansion-details">
-                <p data-space-reveal>Cada cabelo tem a sua história. Aqui, o atendimento é individual e cada detalhe é pensado para respeitar o teu estilo — da primeira conversa à finalização.</p>
-                <p data-space-reveal>Em Campo de Ourique, Lisboa, a Arlete recebe-te para um cuidado próximo e personalizado. Preferes ficar em casa? Há também atendimento ao domicílio, sob marcação.</p>
+            <div className="space-expansion-bottom">
+              <div className="space-expansion-copy">
+                <h2 data-space-reveal>Cuidado pensado para ti.</h2>
+                <p data-space-reveal>Cada atendimento é pessoal, calmo e feito com atenção ao teu estilo.</p>
               </div>
-              <div data-space-reveal>
-                <Button variant="secondary" render={<a href="#contato" />}>Vamos conversar</Button>
+              <div className="space-expansion-thumbnails" aria-label="Explora os serviços">
+                {[
+                  { src: "/images/gallery/02.png", label: "Tranças", category: "penteados", position: "center 38%" },
+                  { src: "/images/gallery/16.png", label: "Penteados", category: "penteados", position: "center 32%" },
+                  { src: "/images/gallery/003.png", label: "Ondas", category: "cabelo", position: "center 42%" },
+                ].map((item) => (
+                  <a key={item.label} href={`/servicos?categoria=${item.category}#servicos-list`} className="space-expansion-thumbnail" data-space-reveal aria-label={`Ver serviços de ${item.label.toLowerCase()}`}>
+                    <Image src={item.src} alt={item.label} fill sizes="(max-width: 700px) 28vw, 150px" style={{ objectPosition: item.position }} />
+                    <span>{item.label}</span>
+                    <span className="space-expansion-thumbnail-arrow" aria-hidden="true">↗</span>
+                  </a>
+                ))}
+              </div>
+              <div className="space-expansion-action" data-space-reveal>
+                <Button variant="inverse" render={<a href="#contato" />}>Vamos conversar</Button>
               </div>
             </div>
           </div>
