@@ -1,239 +1,54 @@
-"use client";
+import { ArrowCircle } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import type { ReviewsPayload } from "../data/google-reviews";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { SectionTitle } from "@/shared/ui/SectionTitleMenu";
-
-type ApiPayload = {
-  ok: boolean;
-  place?: {
-    name: string;
-    rating: number;
-    userRatingCount: number;
-    googleMapsUri: string;
-  };
-  reviews?: {
-    rating: number;
-    text: string;
-    authorName: string;
-    authorUrl?: string;
-    relativeTime?: string;
-  }[];
-};
-
-const fallback: NonNullable<ApiPayload["reviews"]> = [
-  {
-    text: "A melhor cabelereira de sempre! Faço meu cabelo com a Arlete desde 2022 e não me arrependo.",
-    authorName: "Cliente",
-    rating: 5,
-  },
-];
-
-function Stars({ n }: { n: number }) {
-  const v = Math.max(0, Math.min(5, Math.round(n)));
-
+/** Reviews are resolved before the homepage layout is committed. */
+export default function ReviewsSection({ data }: { data: ReviewsPayload }) {
+  const reviews = data?.ok ? data.reviews?.filter((r) => r.text) : [];
+  if (!reviews?.length) return null;
   return (
-    <div className="flex gap-0.5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <span
-          key={i}
-          className={`text-[14px] ${
-            i < v ? "text-[#5b5545]" : "text-[#2f2d2d]/20"
-          }`}
-        >
-          ★
-        </span>
-      ))}
-    </div>
-  );
-}
-
-function SkeletonCard() {
-  return (
-    <div className="animate-pulse rounded-[28px] border border-[#2f2d2d]/10 bg-[#edeae2] p-5 mb-5 break-inside-avoid">
-      <div className="h-3 w-20 bg-[#2f2d2d]/20 rounded mb-3" />
-      <div className="h-3 w-full bg-[#2f2d2d]/20 rounded mb-2" />
-      <div className="h-3 w-5/6 bg-[#2f2d2d]/20 rounded mb-2" />
-      <div className="h-3 w-2/3 bg-[#2f2d2d]/20 rounded" />
-    </div>
-  );
-}
-
-export default function ReviewsSection() {
-  const [data, setData] = useState<ApiPayload | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let alive = true;
-
-    fetch("/api/google-reviews")
-      .then((r) => r.json())
-      .then((json: ApiPayload) => {
-        if (!alive) return;
-        setData(json && typeof json.ok === "boolean" ? json : { ok: false });
-      })
-      .catch(() => {
-        if (!alive) return;
-        setData({ ok: false });
-      })
-      .finally(() => {
-        if (!alive) return;
-        setLoading(false);
-      });
-
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  const list = useMemo(() => {
-    if (data?.ok && Array.isArray(data.reviews) && data.reviews.length)
-      return data.reviews;
-    return fallback;
-  }, [data]);
-
-  const place = data?.place;
-
-  return (
-    <section className="px-4 py-14">
-      <div className="mx-auto w-full max-w-5xl">
-        <SectionTitle
-          overline="Opiniões"
-          title="Avaliações reais no Google"
-          desc="Comentários verificados ajudam a decidir com confiança."
-        />
-
-        {/* HEADER */}
-        {place?.name && (
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#2f2d2d]/10 bg-white px-4 py-3 shadow-sm">
-            <div className="flex items-center gap-3">
-              <span className="text-[12px] font-semibold tracking-[0.18em] text-[#2f2d2d]">
-                {place.name}
-              </span>
-
-              <div className="flex items-center gap-2">
-                <span className="text-[14px] font-semibold text-[#5b5545]">
-                  {Number(place.rating || 0).toFixed(1)}
-                </span>
-                <Stars n={place.rating} />
-                <span className="text-[12px] text-[#2f2d2d]/55">
-                  ({place.userRatingCount})
-                </span>
-              </div>
-            </div>
-
-            {place.googleMapsUri && (
-              <a
-                href={place.googleMapsUri}
-                target="_blank"
-                rel="noreferrer"
-                className="text-[11px] font-semibold tracking-[0.18em] text-[#875f46] hover:opacity-70 transition"
-              >
-                VER NO GOOGLE
-              </a>
-            )}
-          </div>
+    <section className="review-section section-wrap" id="avaliacoes">
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">AS VOZES DE QUEM NOS VISITA</p>
+          <h2>
+            Palavras que
+            <br />
+            <em>ficam.</em>
+          </h2>
+        </div>
+        {data?.place?.googleMapsUri && (
+          <Button variant="secondary" render={<a
+            href={data.place.googleMapsUri}
+            target="_blank"
+            rel="noreferrer"
+           />}>
+            Avaliações no Google
+          </Button>
         )}
-
-        {/* MOBILE */}
-        <div className="mt-8 sm:hidden">
-          <div
-            ref={scrollRef}
-            className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          >
-            {loading
-              ? Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="min-w-[85%] snap-center">
-                    <SkeletonCard />
-                  </div>
-                ))
-              : list.map((r, idx) => (
-                  <div
-                    key={`${r.authorName}-${idx}`}
-                    className="min-w-[85%] snap-center group"
-                  >
-                    <div
-                      className="
-                        rounded-[28px]
-                        border border-[#2f2d2d]/10
-                        bg-white
-                        p-5
-                        shadow-[0_14px_45px_rgba(47,45,45,0.08)]
-                        transition-all duration-300
-                        opacity-80
-                        group-hover:opacity-100
-                        group-hover:scale-[1.02]
-                      "
-                    >
-                      <Stars n={Number(r.rating || 0)} />
-
-                      <p className="mt-3 text-[14px] leading-relaxed text-[#2f2d2d]/85">
-                        {r.text ? `“${r.text}”` : "“Experiência excelente.”"}
-                      </p>
-
-                      <div className="mt-4 flex items-center justify-between gap-3">
-                        <p className="text-[13px] font-semibold text-[#2f2d2d]">
-                          {r.authorName}
-                        </p>
-
-                        {r.relativeTime && (
-                          <p className="text-[12px] text-[#2f2d2d]/55">
-                            {r.relativeTime}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-          </div>
-        </div>
-
-        {/* DESKTOP MASONRY */}
-        <div className="hidden sm:block columns-1 sm:columns-2 lg:columns-3 gap-5 mt-8">
-          {loading
-            ? Array.from({ length: 6 }).map((_, i) => (
-                <SkeletonCard key={i} />
-              ))
-            : list.map((r, idx) => (
-                <div
-                  key={`${r.authorName}-${idx}`}
-                  className="
-                    mb-5 break-inside-avoid
-                    rounded-[28px]
-                    border border-[#2f2d2d]/10
-                    bg-white/90
-                    p-5
-                    shadow-[0_14px_45px_rgba(47,45,45,0.08)]
-                    transition-all duration-300
-                    hover:scale-[1.02]
-                    hover:shadow-[0_20px_60px_rgba(47,45,45,0.12)]
-                  "
-                >
-                  <Stars n={Number(r.rating || 0)} />
-
-                  <p className="mt-3 text-[14px] leading-relaxed text-[#2f2d2d]/85">
-                    {r.text
-                      ? r.text.length > 200
-                        ? `“${r.text.slice(0, 200)}...”`
-                        : `“${r.text}”`
-                      : "“Experiência excelente.”"}
-                  </p>
-
-                  <div className="mt-4 flex items-center justify-between gap-3">
-                    <p className="text-[13px] font-semibold text-[#2f2d2d]">
-                      {r.authorName}
-                    </p>
-
-                    {r.relativeTime && (
-                      <p className="text-[12px] text-[#2f2d2d]/55">
-                        {r.relativeTime}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-        </div>
+      </div>
+      <div className="review-grid">
+        {reviews.slice(0, 3).map((r, i) => (
+          <article className="review-card" key={i}>
+            <span
+              className="review-stars"
+              aria-label={`${r.rating} de 5 estrelas`}
+            >
+              {"★".repeat(Math.min(5, Math.max(0, Math.round(r.rating))))}
+            </span>
+            <blockquote>“{r.text}”</blockquote>
+            <p>
+              {r.authorUrl ? (
+                <a href={r.authorUrl} target="_blank" rel="noreferrer">
+                  {r.authorName} <ArrowCircle />
+                </a>
+              ) : (
+                r.authorName
+              )}
+            </p>
+            <p>Google</p>
+          </article>
+        ))}
       </div>
     </section>
   );
