@@ -23,8 +23,10 @@ export function RotatingImageTrail({ images }: Props) {
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
     const finePointer = matchMedia("(hover: hover) and (pointer: fine)");
     const loadedSources = new Set<string>();
-    const sources = images.map(({ src }) =>
-      getImageProps({ src, alt: "", width: 512, height: 512, quality: 80 }).props.src,
+    const sources = images.map(
+      ({ src }) =>
+        getImageProps({ src, alt: "", width: 512, height: 512, quality: 80 })
+          .props.src,
     );
     const decoding = new Map<string, Promise<void>>();
     const active = new Map<HTMLImageElement, gsap.core.Timeline>();
@@ -40,26 +42,38 @@ export function RotatingImageTrail({ images }: Props) {
     let lastPhotoAt = -Infinity;
 
     const enabled = () =>
-      inViewport && finePointer.matches && !reducedMotion.matches && !document.hidden;
+      inViewport &&
+      finePointer.matches &&
+      !reducedMotion.matches &&
+      !document.hidden;
     const preload = () => {
       if (!enabled() || disposed) return;
       new Set(sources).forEach((source) => {
         if (loadedSources.has(source) || decoding.has(source)) return;
         const image = new Image();
         image.src = source;
-        const promise = image.decode()
-          .then(() => { if (!disposed) loadedSources.add(source); })
+        const promise = image
+          .decode()
+          .then(() => {
+            if (!disposed) loadedSources.add(source);
+          })
           .catch(() => undefined)
-          .finally(() => { decoding.delete(source); });
+          .finally(() => {
+            decoding.delete(source);
+          });
         decoding.set(source, promise);
       });
     };
 
     const createPhoto = (x: number, y: number, deltaX: number) => {
-      if (!bounds || y > bounds.height - 160 || active.size >= MAX_PHOTOS) return false;
+      if (!bounds || y > bounds.height - 160 || active.size >= MAX_PHOTOS)
+        return false;
       // A failed source must not block the other decoded photographs.
       let checked = 0;
-      while (checked < sources.length && !loadedSources.has(sources[imageIndex])) {
+      while (
+        checked < sources.length &&
+        !loadedSources.has(sources[imageIndex])
+      ) {
         imageIndex = (imageIndex + 1) % sources.length;
         checked++;
       }
@@ -88,43 +102,64 @@ export function RotatingImageTrail({ images }: Props) {
 
       active.set(photo, timeline);
       timeline
-        .fromTo(photo, {
-          x, y,
-          xPercent: -50 + (Math.random() - 0.5) * 80,
-          yPercent: -50 + (Math.random() - 0.5) * 10,
-          scale: 1.3,
-          rotation: initialRotation,
-        }, {
-          scale: 1,
-          duration: 0.4,
-          ease: "elastic.out(2, 0.6)",
-        })
-        .to(photo, {
-          x: x + deltaX * 2,
-          rotation: 0,
-          duration: 0.4,
-          ease: "power1.in",
-        }, "<")
-        .to(photo, {
-          y: bottom,
-          scale: 0.9,
-          yPercent: -95,
-          duration: 0.4,
-          ease: "back.in(1.1)",
-        }, "<")
+        .fromTo(
+          photo,
+          {
+            x,
+            y,
+            xPercent: -50 + (Math.random() - 0.5) * 80,
+            yPercent: -50 + (Math.random() - 0.5) * 10,
+            scale: 1.3,
+            rotation: initialRotation,
+          },
+          {
+            scale: 1,
+            duration: 0.4,
+            ease: "elastic.out(2, 0.6)",
+          },
+        )
+        .to(
+          photo,
+          {
+            x: x + deltaX * 2,
+            rotation: 0,
+            duration: 0.4,
+            ease: "power1.in",
+          },
+          "<",
+        )
+        .to(
+          photo,
+          {
+            y: bottom,
+            scale: 0.9,
+            yPercent: -95,
+            duration: 0.4,
+            ease: "back.in(1.1)",
+          },
+          "<",
+        )
         .to(photo, {
           x: `+=${deltaX * 1.6}`,
           rotation: bounceRotation,
           duration: 0.3,
           ease: "power1.in",
         })
-        .to(photo, {
-          yPercent: 150,
-          duration: 0.3,
-          ease: `back.in(${1.5 + (1 - y / bounds.height)})`,
-        }, "<");
+        .to(
+          photo,
+          {
+            yPercent: 150,
+            duration: 0.3,
+            ease: `back.in(${1.5 + (1 - y / bounds.height)})`,
+          },
+          "<",
+        );
       timeline.to(photo, { opacity: 1, duration: 0.2, ease: "power1.out" }, 0);
-      timeline.to(photo, { opacity: 0, duration: 0.5, ease: "power1.inOut" }, 0.4);
+      timeline.to(
+        photo,
+        { opacity: 0, duration: 0.5, ease: "power1.inOut" },
+        0.4,
+      );
       return true;
     };
 
@@ -139,8 +174,10 @@ export function RotatingImageTrail({ images }: Props) {
       pending = undefined;
       if (accumulatedDistance >= MIN_DISTANCE_PX) {
         accumulatedDistance = 0;
-        if (performance.now() - lastPhotoAt >= COOLDOWN_MS &&
-          createPhoto(point.x - bounds.left, point.y - bounds.top, point.deltaX)) {
+        if (
+          performance.now() - lastPhotoAt >= COOLDOWN_MS &&
+          createPhoto(point.x - bounds.left, point.y - bounds.top, point.deltaX)
+        ) {
           lastPhotoAt = performance.now();
         }
       }
@@ -152,11 +189,17 @@ export function RotatingImageTrail({ images }: Props) {
       const deltaX = previous ? x - previous.x : 0;
       const coolingDown = performance.now() - lastPhotoAt < COOLDOWN_MS;
       if (coolingDown) accumulatedDistance = 0;
-      else if (previous) accumulatedDistance += Math.abs(deltaX) + Math.abs(y - previous.y);
+      else if (previous)
+        accumulatedDistance += Math.abs(deltaX) + Math.abs(y - previous.y);
       previous = { x, y };
       pending = { x, y, deltaX };
       // Keep native event distance, but create at most one photograph per frame.
-      if (!frame && !coolingDown && (boundsDirty || !bounds || accumulatedDistance >= MIN_DISTANCE_PX)) frame = requestAnimationFrame(flush);
+      if (
+        !frame &&
+        !coolingDown &&
+        (boundsDirty || !bounds || accumulatedDistance >= MIN_DISTANCE_PX)
+      )
+        frame = requestAnimationFrame(flush);
     };
     const resetPointer = () => {
       previous = undefined;
@@ -171,7 +214,10 @@ export function RotatingImageTrail({ images }: Props) {
     };
     const stop = () => {
       resetPointer();
-      active.forEach((timeline, photo) => { timeline.kill(); photo.remove(); });
+      active.forEach((timeline, photo) => {
+        timeline.kill();
+        photo.remove();
+      });
       active.clear();
     };
     const availability = () => {
@@ -211,5 +257,12 @@ export function RotatingImageTrail({ images }: Props) {
     };
   }, [images]);
 
-  return <div ref={layerRef} className={styles.layer} data-image-trail aria-hidden="true" />;
+  return (
+    <div
+      ref={layerRef}
+      className={styles.layer}
+      data-image-trail
+      aria-hidden="true"
+    />
+  );
 }

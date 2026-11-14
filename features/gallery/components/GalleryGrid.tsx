@@ -19,9 +19,15 @@ export function GalleryGrid() {
   const isOpen = active !== null;
   useEffect(() => {
     const element = grid.current;
-    if (!element || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (
+      !element ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
 
-    const tiles = Array.from(element.querySelectorAll<HTMLElement>(".gallery-tile"));
+    const tiles = Array.from(
+      element.querySelectorAll<HTMLElement>(".gallery-tile"),
+    );
     const animations = new Set<gsap.core.Tween>();
     const revealed = new Set<HTMLElement>();
     gsap.set(tiles, { autoAlpha: 0, y: 42, scale: 0.94 });
@@ -43,20 +49,34 @@ export function GalleryGrid() {
         animations.add(tween);
       });
     };
-    const transitionActive = () => document.querySelector('.page-transition[data-active="true"]') !== null;
-    const observer = new IntersectionObserver((entries) => {
-      if (transitionActive()) return;
-      reveal(entries
-        .filter((entry) => entry.isIntersecting && !revealed.has(entry.target as HTMLElement))
-        .map((entry) => entry.target as HTMLElement)
-        .sort((a, b) => tiles.indexOf(a) - tiles.indexOf(b)));
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+    const transitionActive = () =>
+      document.querySelector('.page-transition[data-active="true"]') !== null;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (transitionActive()) return;
+        reveal(
+          entries
+            .filter(
+              (entry) =>
+                entry.isIntersecting &&
+                !revealed.has(entry.target as HTMLElement),
+            )
+            .map((entry) => entry.target as HTMLElement)
+            .sort((a, b) => tiles.indexOf(a) - tiles.indexOf(b)),
+        );
+      },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
+    );
     const onPageVisible = () => {
       const viewport = window.innerHeight;
-      reveal(tiles.filter((tile) => {
-        const rect = tile.getBoundingClientRect();
-        return !revealed.has(tile) && rect.top < viewport * 0.92 && rect.bottom > 0;
-      }));
+      reveal(
+        tiles.filter((tile) => {
+          const rect = tile.getBoundingClientRect();
+          return (
+            !revealed.has(tile) && rect.top < viewport * 0.92 && rect.bottom > 0
+          );
+        }),
+      );
     };
 
     tiles.forEach((tile) => observer.observe(tile));
@@ -84,16 +104,23 @@ export function GalleryGrid() {
   useEffect(() => {
     if (active === null) return;
     const strip = filmstrip.current;
-    const thumb = strip?.querySelector<HTMLElement>(`[data-gallery-index="${active}"]`);
+    const thumb = strip?.querySelector<HTMLElement>(
+      `[data-gallery-index="${active}"]`,
+    );
     if (!strip || !thumb) return;
     strip.scrollTo({
       left: thumb.offsetLeft - (strip.clientWidth - thumb.clientWidth) / 2,
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "instant"
+        : "smooth",
     });
   }, [active]);
-  useEffect(() => () => {
-    if (fadeTimer.current) clearTimeout(fadeTimer.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (fadeTimer.current) clearTimeout(fadeTimer.current);
+    },
+    [],
+  );
   const close = () => {
     if (fadeTimer.current) clearTimeout(fadeTimer.current);
     fadeTimer.current = null;
@@ -104,7 +131,10 @@ export function GalleryGrid() {
     if (index === active) return;
     const alreadyFading = fadeTimer.current !== null;
     if (fadeTimer.current) clearTimeout(fadeTimer.current);
-    if (active !== null && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (
+      active !== null &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       if (!alreadyFading) setOutgoing(active);
       fadeTimer.current = setTimeout(() => {
         setOutgoing(null);
@@ -114,7 +144,8 @@ export function GalleryGrid() {
     setActive(index);
   };
   const move = (direction: number) => {
-    if (active !== null) select((active + direction + ITEMS.length) % ITEMS.length);
+    if (active !== null)
+      select((active + direction + ITEMS.length) % ITEMS.length);
   };
   const current = active === null ? null : ITEMS[active];
   const number = (value: number) => String(value).padStart(2, "0");
@@ -128,7 +159,10 @@ export function GalleryGrid() {
             animated={false}
             variant="ghost"
             aria-label={`Ver: ${item.alt}`}
-            onClick={(event) => { opener.current = event.currentTarget; select(index); }}
+            onClick={(event) => {
+              opener.current = event.currentTarget;
+              select(index);
+            }}
           >
             <Image
               src={item.src}
@@ -145,13 +179,22 @@ export function GalleryGrid() {
         className={styles.galleryDialog}
         aria-label="Visualização da galeria"
         onClose={close}
-        onCancel={(event) => { event.preventDefault(); close(); }}
+        onCancel={(event) => {
+          event.preventDefault();
+          close();
+        }}
         onClick={(event) => {
           if (event.target === event.currentTarget) close();
         }}
         onKeyDown={(event) => {
-          if (event.key === "ArrowRight") { event.preventDefault(); move(1); }
-          if (event.key === "ArrowLeft") { event.preventDefault(); move(-1); }
+          if (event.key === "ArrowRight") {
+            event.preventDefault();
+            move(1);
+          }
+          if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            move(-1);
+          }
         }}
       >
         {current && (
@@ -159,47 +202,105 @@ export function GalleryGrid() {
             <header className={styles.galleryDialogHeader}>
               <div className={styles.galleryDialogContext}>
                 <span>GALERIA</span>
-                {current.category && <><span className={styles.galleryDialogDivider} aria-hidden="true" /><span>{current.category}</span></>}
+                {current.category && (
+                  <>
+                    <span
+                      className={styles.galleryDialogDivider}
+                      aria-hidden="true"
+                    />
+                    <span>{current.category}</span>
+                  </>
+                )}
               </div>
-              <Button className={styles.galleryClose} size="icon" animated={false} aria-label="Fechar galeria" onClick={close}>
+              <Button
+                className={styles.galleryClose}
+                size="icon"
+                animated={false}
+                aria-label="Fechar galeria"
+                onClick={close}
+              >
                 <X aria-hidden="true" />
               </Button>
             </header>
             <div className={styles.galleryViewer}>
-              <Button className={styles.galleryPrev} variant="arrow" direction="left" aria-label="Fotografia anterior" onClick={() => move(-1)} />
+              <Button
+                className={styles.galleryPrev}
+                variant="arrow"
+                direction="left"
+                aria-label="Fotografia anterior"
+                onClick={() => move(-1)}
+              />
               <div
                 className={styles.galleryPhoto}
                 aria-live="polite"
                 aria-atomic="true"
-                onTouchStart={(event) => { touchStart.current = event.touches[0].clientX; }}
+                onTouchStart={(event) => {
+                  touchStart.current = event.touches[0].clientX;
+                }}
                 onTouchEnd={(event) => {
                   if (touchStart.current === null) return;
-                  const delta = event.changedTouches[0].clientX - touchStart.current;
+                  const delta =
+                    event.changedTouches[0].clientX - touchStart.current;
                   if (Math.abs(delta) > 60) move(delta < 0 ? 1 : -1);
                   touchStart.current = null;
                 }}
               >
                 {outgoing !== null && (
-                  <div className={`${styles.galleryPhotoLayer} ${styles.galleryPhotoOutgoing}`} aria-hidden="true">
-                    <Image src={ITEMS[outgoing].src} alt="" fill sizes="(max-width: 640px) 100vw, 80vw" />
+                  <div
+                    className={`${styles.galleryPhotoLayer} ${styles.galleryPhotoOutgoing}`}
+                    aria-hidden="true"
+                  >
+                    <Image
+                      src={ITEMS[outgoing].src}
+                      alt=""
+                      fill
+                      sizes="(max-width: 640px) 100vw, 80vw"
+                    />
                   </div>
                 )}
-                <div className={`${styles.galleryPhotoLayer} ${styles.galleryPhotoCurrent}`} key={current.id}>
-                  <Image src={current.src} alt={current.alt} fill sizes="(max-width: 640px) 100vw, 80vw" />
+                <div
+                  className={`${styles.galleryPhotoLayer} ${styles.galleryPhotoCurrent}`}
+                  key={current.id}
+                >
+                  <Image
+                    src={current.src}
+                    alt={current.alt}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 80vw"
+                  />
                 </div>
               </div>
-              <Button className={styles.galleryNext} variant="arrow" direction="right" aria-label="Fotografia seguinte" onClick={() => move(1)} />
+              <Button
+                className={styles.galleryNext}
+                variant="arrow"
+                direction="right"
+                aria-label="Fotografia seguinte"
+                onClick={() => move(1)}
+              />
             </div>
             <div className={styles.galleryDialogCaption}>
               <div>
                 <p className={styles.galleryCaptionTitle}>{current.alt}</p>
-                {current.category && <p className={styles.galleryCaptionCategory}>{current.category}</p>}
+                {current.category && (
+                  <p className={styles.galleryCaptionCategory}>
+                    {current.category}
+                  </p>
+                )}
               </div>
-              <p className={styles.galleryCounter} aria-label={`Fotografia ${active! + 1} de ${ITEMS.length}`}>
-                <span>{number(active! + 1)}</span><span aria-hidden="true"> / </span><span>{number(ITEMS.length)}</span>
+              <p
+                className={styles.galleryCounter}
+                aria-label={`Fotografia ${active! + 1} de ${ITEMS.length}`}
+              >
+                <span>{number(active! + 1)}</span>
+                <span aria-hidden="true"> / </span>
+                <span>{number(ITEMS.length)}</span>
               </p>
             </div>
-            <div className={styles.galleryFilmstrip} ref={filmstrip} aria-label="Escolher fotografia">
+            <div
+              className={styles.galleryFilmstrip}
+              ref={filmstrip}
+              aria-label="Escolher fotografia"
+            >
               {ITEMS.map((item, index) => (
                 <button
                   key={item.id}

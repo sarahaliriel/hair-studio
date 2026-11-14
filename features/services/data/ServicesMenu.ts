@@ -1,4 +1,8 @@
-export type ServiceCategoryKey = "coloracao" | "penteados" | "cabelo" | "domicilio";
+export type ServiceCategoryKey =
+  | "coloracao"
+  | "penteados"
+  | "cabelo"
+  | "domicilio";
 
 export type ServiceCategory = {
   key: ServiceCategoryKey;
@@ -22,29 +26,28 @@ export const serviceCategories: ServiceCategory[] = [
 ];
 
 export const servicesMenu: ServiceItem[] = [
-
-{
-  id: "col1",
-  category: "coloracao",
-  name: "Coloração completa",
-  desc: "Aplicação uniforme com produtos profissionais. Ideal para mudança total de tom.",
-  priceFrom: "desde 35€",
-},
-{
-  id: "col2",
-  category: "coloracao",
-  name: "Balayage",
-  desc: "Técnica de iluminação natural, personalizada conforme o teu cabelo.",
-  priceFrom: "desde 80€",
-  badge: "Tendência",
-},
-{
-  id: "col3",
-  category: "coloracao",
-  name: "Madeixas",
-  desc: "Clareamento localizado para dar luz e profundidade ao cabelo.",
-  priceFrom: "desde 70€",
-},
+  {
+    id: "col1",
+    category: "coloracao",
+    name: "Coloração completa",
+    desc: "Aplicação uniforme com produtos profissionais. Ideal para mudança total de tom.",
+    priceFrom: "desde 35€",
+  },
+  {
+    id: "col2",
+    category: "coloracao",
+    name: "Balayage",
+    desc: "Técnica de iluminação natural, personalizada conforme o teu cabelo.",
+    priceFrom: "desde 80€",
+    badge: "Tendência",
+  },
+  {
+    id: "col3",
+    category: "coloracao",
+    name: "Madeixas",
+    desc: "Clareamento localizado para dar luz e profundidade ao cabelo.",
+    priceFrom: "desde 70€",
+  },
 
   {
     id: "t1",
@@ -91,7 +94,7 @@ export const servicesMenu: ServiceItem[] = [
     priceFrom: "desde 15€",
   },
 
-    {
+  {
     id: "c4",
     category: "cabelo",
     name: "Corte (masculino/infantil)",
@@ -99,7 +102,7 @@ export const servicesMenu: ServiceItem[] = [
     priceFrom: "desde 12€",
   },
 
-    {
+  {
     id: "c5",
     category: "cabelo",
     name: "Progressiva",
@@ -107,7 +110,7 @@ export const servicesMenu: ServiceItem[] = [
     priceFrom: "desde 90€",
   },
 
-    {
+  {
     id: "c6",
     category: "cabelo",
     name: "Relaxamento capilar",

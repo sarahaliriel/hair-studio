@@ -22,7 +22,10 @@ export function Navbar() {
   return (
     <header className={`classic-header ${styles.classicHeader}`}>
       <div className={`classic-navbar ${styles.classicNavbar}`}>
-        <nav className={`classic-nav-left ${styles.classicNavLeft}`} aria-label="Navegação principal">
+        <nav
+          className={`classic-nav-left ${styles.classicNavLeft}`}
+          aria-label="Navegação principal"
+        >
           {left.map((item) => (
             <Link href={item.href} key={item.href}>
               {item.label}
@@ -50,11 +53,12 @@ export function Navbar() {
               </Link>
             ))}
           </nav>
-          <Button className={`navbar-booking ${styles.navbarBooking}`} render={<a
-            href={bookingHref}
-            target="_blank"
-            rel="noopener noreferrer"
-           />}>
+          <Button
+            className={`navbar-booking ${styles.navbarBooking}`}
+            render={
+              <a href={bookingHref} target="_blank" rel="noopener noreferrer" />
+            }
+          >
             WhatsApp
           </Button>
         </div>
@@ -83,11 +87,16 @@ export function Navbar() {
                 {item.label}
               </Link>
             ))}
-            <Button variant="inverse" render={<a
-              href={bookingHref}
-              target="_blank"
-              rel="noopener noreferrer"
-             />}>
+            <Button
+              variant="inverse"
+              render={
+                <a
+                  href={bookingHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />
+              }
+            >
               Marcar no WhatsApp
             </Button>
             <a href={`tel:${site.phoneRaw}`}>Ligar · {site.phoneDisplay}</a>

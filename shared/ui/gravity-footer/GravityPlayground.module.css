@@ -15,8 +15,12 @@
   user-select: none;
   -webkit-user-select: none;
 }
-.stage[data-mode="physics"] { cursor: grab; }
-.stage[data-dragging="true"] { cursor: grabbing; }
+.stage[data-mode="physics"] {
+  cursor: grab;
+}
+.stage[data-dragging="true"] {
+  cursor: grabbing;
+}
 .tool {
   position: absolute;
   width: min(var(--tool-width), 22vw);
@@ -37,10 +41,16 @@
   will-change: transform;
 }
 .stage[data-state="sleeping"] .tool,
-.stage[data-state="paused"] .tool { will-change: auto; }
+.stage[data-state="paused"] .tool {
+  will-change: auto;
+}
 @media (max-width: 600px) {
-  .tool { width: min(var(--tool-width), 27vw); }
+  .tool {
+    width: min(var(--tool-width), 27vw);
+  }
 }
 @media (max-width: 760px) {
-  .stage { bottom: 144px; }
+  .stage {
+    bottom: 144px;
+  }
 }

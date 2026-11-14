@@ -8,6 +8,8 @@ import { usePageTransition } from "@/shared/ui/PageTransition";
 export default function RouteTemplate({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { ready } = usePageTransition();
-  useLayoutEffect(() => { ready(pathname); }, [pathname, ready]);
+  useLayoutEffect(() => {
+    ready(pathname);
+  }, [pathname, ready]);
   return children;
 }

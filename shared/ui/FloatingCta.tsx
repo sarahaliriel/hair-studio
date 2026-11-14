@@ -17,10 +17,17 @@ export function FloatingCTA() {
     if (!bar) return;
     const sync = () => syncFloatingCtaInert(bar, visibleRef.current);
     const observer = new MutationObserver(sync);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
     for (const selector of [".home-intro", ".page-transition"]) {
       const overlay = document.querySelector(selector);
-      if (overlay) observer.observe(overlay, { attributes: true, attributeFilter: ["data-active"] });
+      if (overlay)
+        observer.observe(overlay, {
+          attributes: true,
+          attributeFilter: ["data-active"],
+        });
     }
     document.addEventListener("arlete:page-visible", sync);
     sync();
@@ -39,7 +46,9 @@ export function FloatingCTA() {
     const bar = barRef.current;
     if (!bar) return;
 
-    const actions = document.querySelector<HTMLElement>(".gallery-hero-actions");
+    const actions = document.querySelector<HTMLElement>(
+      ".gallery-hero-actions",
+    );
     if (!actions) {
       const frame = requestAnimationFrame(() => setVisible(true));
       return () => cancelAnimationFrame(frame);
@@ -54,8 +63,14 @@ export function FloatingCTA() {
         const heroBooking = actions.querySelector<HTMLElement>("a");
         if (!heroBooking) return;
         const bookingRect = heroBooking.getBoundingClientRect();
-        const navbarBottom = document.querySelector(".classic-navbar")?.getBoundingClientRect().bottom ?? 0;
-        if (bookingRect.top < navbarBottom || bookingRect.bottom > window.innerHeight) return;
+        const navbarBottom =
+          document.querySelector(".classic-navbar")?.getBoundingClientRect()
+            .bottom ?? 0;
+        if (
+          bookingRect.top < navbarBottom ||
+          bookingRect.bottom > window.innerHeight
+        )
+          return;
         heroBooking.focus({ preventScroll: true });
       }
       setVisible(show);
@@ -94,7 +109,11 @@ export function FloatingCTA() {
   }, [pathname]);
 
   return (
-    <div ref={barRef} className={`mobile-booking ${styles.floatingCta}`} data-visible={visible}>
+    <div
+      ref={barRef}
+      className={`mobile-booking ${styles.floatingCta}`}
+      data-visible={visible}
+    >
       <BookingLink>Marcar pelo WhatsApp</BookingLink>
     </div>
   );

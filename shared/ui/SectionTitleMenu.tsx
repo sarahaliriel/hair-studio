@@ -12,7 +12,12 @@ export function SectionTitle({
   as?: "h1" | "h2";
 }) {
   return (
-    <div className="section-title-menu mb-8" data-reveal="stagger" data-reveal-start="top 88%" data-reveal-exit="none">
+    <div
+      className="section-title-menu mb-8"
+      data-reveal="stagger"
+      data-reveal-start="top 88%"
+      data-reveal-exit="none"
+    >
       {overline ? (
         <div className="flex items-center gap-3">
           <span className="h-1.5 w-1.5 rounded-full bg-[#875f46]" />

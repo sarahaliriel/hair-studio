@@ -28,7 +28,11 @@ export default function GaleriaPage() {
 
       <section className="px-4 pb-16">
         <div className="mx-auto w-full max-w-5xl">
-          <div className="soft-card overflow-hidden border border-[#2f2d2d]/10 bg-white/40" data-reveal="fadeUp" data-reveal-exit="none">
+          <div
+            className="soft-card overflow-hidden border border-[#2f2d2d]/10 bg-white/40"
+            data-reveal="fadeUp"
+            data-reveal-exit="none"
+          >
             <div className="p-7 sm:p-10">
               <SectionTitle
                 title="Gostou do que viu?"

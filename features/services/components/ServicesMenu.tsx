@@ -25,9 +25,15 @@ function waLink(serviceName: string) {
   return `https://wa.me/${site.whatsappRaw}?text=${text}`;
 }
 
-export function ServicesMenu({ initialCategory }: { initialCategory?: string }) {
+export function ServicesMenu({
+  initialCategory,
+}: {
+  initialCategory?: string;
+}) {
   const [active, setActive] = useState<ServiceCategoryKey>(
-    serviceCategories.find((item) => item.key === initialCategory)?.key ?? serviceCategories[0]?.key ?? "coloracao",
+    serviceCategories.find((item) => item.key === initialCategory)?.key ??
+      serviceCategories[0]?.key ??
+      "coloracao",
   );
   const [q, setQ] = useState("");
 
@@ -42,7 +48,11 @@ export function ServicesMenu({ initialCategory }: { initialCategory?: string }) 
 
   return (
     <section id="servicos-list" className="mt-8 scroll-mt-28">
-      <div className="rounded-[28px] border border-black/10 bg-white/40 p-3 backdrop-blur" data-reveal="fadeUp" data-reveal-exit="none">
+      <div
+        className="rounded-[28px] border border-black/10 bg-white/40 p-3 backdrop-blur"
+        data-reveal="fadeUp"
+        data-reveal-exit="none"
+      >
         <div className="flex flex-wrap gap-2 px-1 py-1">
           {serviceCategories.map((c) => {
             const on = c.key === active;
@@ -61,7 +71,9 @@ export function ServicesMenu({ initialCategory }: { initialCategory?: string }) 
         </div>
 
         <div className="mt-3 px-1">
-          <div className={`${styles.serviceSearch} flex items-center gap-2 rounded-full border border-black/10 bg-[#edeae2]/60 px-4 py-3`}>
+          <div
+            className={`${styles.serviceSearch} flex items-center gap-2 rounded-full border border-black/10 bg-[#edeae2]/60 px-4 py-3`}
+          >
             <span className="text-black/45">⌕</span>
             <input
               value={q}
@@ -88,7 +100,13 @@ export function ServicesMenu({ initialCategory }: { initialCategory?: string }) 
         {visible.length ? (
           <ul className="divide-y divide-black/10">
             {visible.map((s) => (
-              <li data-reveal="fadeUp" data-reveal-start="top 88%" data-reveal-exit="none" key={s.id} className="p-6 sm:px-8 sm:py-7">
+              <li
+                data-reveal="fadeUp"
+                data-reveal-start="top 88%"
+                data-reveal-exit="none"
+                key={s.id}
+                className="p-6 sm:px-8 sm:py-7"
+              >
                 <div className="grid gap-5 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-8">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
@@ -111,11 +129,15 @@ export function ServicesMenu({ initialCategory }: { initialCategory?: string }) 
                       {s.priceFrom}
                     </span>
 
-                    <Button render={<a
-                      href={waLink(s.name)}
-                      target="_blank"
-                      rel="noreferrer"
-                     />}>
+                    <Button
+                      render={
+                        <a
+                          href={waLink(s.name)}
+                          target="_blank"
+                          rel="noreferrer"
+                        />
+                      }
+                    >
                       Marcar
                     </Button>
                   </div>

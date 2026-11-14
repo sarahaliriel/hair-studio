@@ -14,33 +14,51 @@ import { renderToStaticMarkup } from "react-dom/server";
 function load(file, globals = {}, dependencies = {}) {
   const filename = path.resolve(file);
   const code = ts.transpileModule(fs.readFileSync(filename, "utf8"), {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, jsx: ts.JsxEmit.ReactJSX },
+    compilerOptions: {
+      module: ts.ModuleKind.CommonJS,
+      target: ts.ScriptTarget.ES2020,
+      jsx: ts.JsxEmit.ReactJSX,
+    },
   }).outputText;
   const compiled = { exports: {} };
-  vm.runInNewContext(code, {
-    module: compiled, exports: compiled.exports,
-    require: (name) => {
-      if (/^\.\/[^/]+\.module\.css$/.test(name)) {
-        const css = fs.readFileSync(path.join(path.dirname(filename), name), "utf8");
-        const classes = Object.fromEntries(
-          [...css.matchAll(/\.([a-zA-Z_][\w-]*)/g)].map((match) => [match[1], match[1]]),
-        );
-        return { default: Object.freeze(classes) };
-      }
-      assert.ok(name in dependencies, `unexpected dependency: ${name}`);
-      return dependencies[name];
-    }, ...globals,
-  }, { filename });
+  vm.runInNewContext(
+    code,
+    {
+      module: compiled,
+      exports: compiled.exports,
+      require: (name) => {
+        if (/^\.\/[^/]+\.module\.css$/.test(name)) {
+          const css = fs.readFileSync(
+            path.join(path.dirname(filename), name),
+            "utf8",
+          );
+          const classes = Object.fromEntries(
+            [...css.matchAll(/\.([a-zA-Z_][\w-]*)/g)].map((match) => [
+              match[1],
+              match[1],
+            ]),
+          );
+          return { default: Object.freeze(classes) };
+        }
+        assert.ok(name in dependencies, `unexpected dependency: ${name}`);
+        return dependencies[name];
+      },
+      ...globals,
+    },
+    { filename },
+  );
   return compiled.exports;
 }
 const policy = load("shared/ui/scroll-scene.ts");
-const { syncFloatingCtaInert } = load("shared/ui/floating-cta-interactivity.ts");
+const { syncFloatingCtaInert } = load(
+  "shared/ui/floating-cta-interactivity.ts",
+);
 const { hashTarget, alignHash } = load("shared/ui/page-transition/anchors.ts");
 
 test("anchor alignment decodes fragments and preserves CSS scroll offsets", () => {
   const calls = [];
   const target = { scrollIntoView: (options) => calls.push(options) };
-  const doc = { getElementById: (id) => id === "contato" ? target : null };
+  const doc = { getElementById: (id) => (id === "contato" ? target : null) };
   assert.equal(hashTarget("#contato", doc), target);
   assert.equal(hashTarget("#%63ontato", doc), target);
   assert.equal(alignHash("#contato", doc), true);
@@ -51,28 +69,58 @@ test("anchor alignment decodes fragments and preserves CSS scroll offsets", () =
 
 test("missing or malformed anchors do not start a scroll", () => {
   let calls = 0;
-  const doc = { getElementById: () => { calls++; return null; } };
+  const doc = {
+    getElementById: () => {
+      calls++;
+      return null;
+    },
+  };
   for (const hash of ["", "#", "#inexistente", "#%E0%A4%A"]) {
     assert.equal(alignHash(hash, doc), false);
   }
   assert.equal(calls, 1);
 });
 
-function floatingCtaState({ introPending = false, introActive = false, transitionActive = false } = {}) {
+function floatingCtaState({
+  introPending = false,
+  introActive = false,
+  transitionActive = false,
+} = {}) {
   const state = { introPending, introActive, transitionActive };
   const doc = {
     activeElement: null,
-    documentElement: { classList: { contains: (name) => name === "intro-pending" && state.introPending } },
-    querySelector: (selector) => selector.includes(".home-intro")
-      ? (state.introActive ? {} : null)
-      : (state.transitionActive ? {} : null),
+    documentElement: {
+      classList: {
+        contains: (name) => name === "intro-pending" && state.introPending,
+      },
+    },
+    querySelector: (selector) =>
+      selector.includes(".home-intro")
+        ? state.introActive
+          ? {}
+          : null
+        : state.transitionActive
+          ? {}
+          : null,
   };
-  const bar = { inert: false, contains: (element) => element !== null && element === doc.activeElement && element === bar.focused };
+  const bar = {
+    inert: false,
+    contains: (element) =>
+      element !== null &&
+      element === doc.activeElement &&
+      element === bar.focused,
+  };
   return { state, doc, bar };
 }
 
 test("Floating CTA inert combines visibility, intro and page transition locks", () => {
-  for (const [visible, introPending, introActive, transitionActive, expected] of [
+  for (const [
+    visible,
+    introPending,
+    introActive,
+    transitionActive,
+    expected,
+  ] of [
     [false, true, false, false, true],
     [true, true, false, false, true],
     [false, false, false, false, true],
@@ -83,7 +131,11 @@ test("Floating CTA inert combines visibility, intro and page transition locks", 
     [false, false, false, true, true],
     [true, false, true, true, true],
   ]) {
-    const { state, doc, bar } = floatingCtaState({ introPending, introActive, transitionActive });
+    const { state, doc, bar } = floatingCtaState({
+      introPending,
+      introActive,
+      transitionActive,
+    });
     assert.equal(syncFloatingCtaInert(bar, visible, doc), expected);
     assert.equal(bar.inert, expected, JSON.stringify({ visible, ...state }));
   }
@@ -94,23 +146,55 @@ test("Floating CTA remains locked across route changes, reverse scroll and reduc
   assert.equal(syncFloatingCtaInert(bar, true, doc), true);
   state.transitionActive = true;
   state.introActive = false;
-  assert.equal(syncFloatingCtaInert(bar, true, doc), true, "route transition retains the lock");
+  assert.equal(
+    syncFloatingCtaInert(bar, true, doc),
+    true,
+    "route transition retains the lock",
+  );
   state.transitionActive = false;
-  assert.equal(syncFloatingCtaInert(bar, true, doc), false, "destination without Hero is interactive");
+  assert.equal(
+    syncFloatingCtaInert(bar, true, doc),
+    false,
+    "destination without Hero is interactive",
+  );
   state.transitionActive = true;
   state.introPending = true;
-  assert.equal(syncFloatingCtaInert(bar, true, doc), true, "returning Home remains locked");
+  assert.equal(
+    syncFloatingCtaInert(bar, true, doc),
+    true,
+    "returning Home remains locked",
+  );
   state.transitionActive = false;
   state.introPending = false;
-  assert.equal(syncFloatingCtaInert(bar, false, doc), true, "Hero actions hide the bar");
-  assert.equal(syncFloatingCtaInert(bar, true, doc), false, "scrolling past Hero exposes the bar");
-  assert.equal(syncFloatingCtaInert(bar, false, doc), true, "reverse scroll hides it again");
-  assert.equal(syncFloatingCtaInert(bar, true, doc), false, "reduced motion with no intro lock can expose it");
+  assert.equal(
+    syncFloatingCtaInert(bar, false, doc),
+    true,
+    "Hero actions hide the bar",
+  );
+  assert.equal(
+    syncFloatingCtaInert(bar, true, doc),
+    false,
+    "scrolling past Hero exposes the bar",
+  );
+  assert.equal(
+    syncFloatingCtaInert(bar, false, doc),
+    true,
+    "reverse scroll hides it again",
+  );
+  assert.equal(
+    syncFloatingCtaInert(bar, true, doc),
+    false,
+    "reduced motion with no intro lock can expose it",
+  );
 });
 
 test("Floating CTA releases focus before becoming inert", () => {
   const { state, doc, bar } = floatingCtaState();
-  const focused = { blur() { doc.activeElement = null; } };
+  const focused = {
+    blur() {
+      doc.activeElement = null;
+    },
+  };
   bar.focused = focused;
   doc.activeElement = focused;
   assert.equal(syncFloatingCtaInert(bar, true, doc), false);
@@ -133,61 +217,139 @@ class Events {
     this.listeners.get(event.type)?.forEach((callback) => callback(event));
   }
 }
-const style = (metrics) => new Proxy({
-  setProperty(name, value) { this[name] = value; },
-  removeProperty(name) { delete this[name]; },
-}, {
-  set(target, key, value) {
-    if (metrics) metrics.styleWrites++;
-    target[key] = value;
-    return true;
-  },
-  deleteProperty(target, key) {
-    if (metrics) metrics.styleWrites++;
-    delete target[key];
-    return true;
-  },
-});
+const style = (metrics) =>
+  new Proxy(
+    {
+      setProperty(name, value) {
+        this[name] = value;
+      },
+      removeProperty(name) {
+        delete this[name];
+      },
+    },
+    {
+      set(target, key, value) {
+        if (metrics) metrics.styleWrites++;
+        target[key] = value;
+        return true;
+      },
+      deleteProperty(target, key) {
+        if (metrics) metrics.styleWrites++;
+        delete target[key];
+        return true;
+      },
+    },
+  );
 
-function mount({ height = 900, width = 1440, offset = 110, hash = "", reduced = false, implementation = "shared/ui/ArcScroll.tsx", arcTargets = [] } = {}) {
+function mount({
+  height = 900,
+  width = 1440,
+  offset = 110,
+  hash = "",
+  reduced = false,
+  implementation = "shared/ui/ArcScroll.tsx",
+  arcTargets = [],
+} = {}) {
   const metrics = { queries: 0, styleWrites: 0, attributeWrites: 0 };
   const frames = new Map();
   let sequence = 0;
   let cleanup;
   let disconnected = false;
-  const window = Object.assign(new Events(), { innerHeight: height, scrollY: 0 });
+  const window = Object.assign(new Events(), {
+    innerHeight: height,
+    scrollY: 0,
+  });
   const media = Object.assign(new Events(), { matches: reduced });
   window.matchMedia = () => media;
   const location = { hash };
-  const content = { style: style(metrics), inert: false, contains: (node) => node === focusedChild, querySelectorAll: () => arcTargets };
+  const content = {
+    style: style(metrics),
+    inert: false,
+    contains: (node) => node === focusedChild,
+    querySelectorAll: () => arcTargets,
+  };
   const focusedChild = {};
-  const surface = { style: style(metrics), removeAttribute() { metrics.styleWrites++; this.style = style(metrics); } };
-  const outgoing = { offsetHeight: 2000, offsetTop: 999, style: style(metrics), hasAttribute: () => true, offsetParent: null };
+  const surface = {
+    style: style(metrics),
+    removeAttribute() {
+      metrics.styleWrites++;
+      this.style = style(metrics);
+    },
+  };
+  const outgoing = {
+    offsetHeight: 2000,
+    offsetTop: 999,
+    style: style(metrics),
+    hasAttribute: () => true,
+    offsetParent: null,
+  };
   const section = Object.assign(new Events(), {
-    dataset: {}, style: style(metrics), offsetTop: 2000, offsetParent: outgoing,
+    dataset: {},
+    style: style(metrics),
+    offsetTop: 2000,
+    offsetParent: outgoing,
     attributes: new Map(),
     hasAttribute: () => false,
     closest: () => section,
-    querySelector: (selector) => { metrics.queries++; return selector === "[data-arc-content]" ? content : surface; },
-    getAttribute(name) { return this.attributes.get(name) ?? null; },
-    setAttribute(name, value) { metrics.attributeWrites++; this.attributes.set(name, value); },
-    removeAttribute(name) { metrics.attributeWrites++; this.attributes.delete(name); },
-    focus() { document.activeElement = section; },
+    querySelector: (selector) => {
+      metrics.queries++;
+      return selector === "[data-arc-content]" ? content : surface;
+    },
+    getAttribute(name) {
+      return this.attributes.get(name) ?? null;
+    },
+    setAttribute(name, value) {
+      metrics.attributeWrites++;
+      this.attributes.set(name, value);
+    },
+    removeAttribute(name) {
+      metrics.attributeWrites++;
+      this.attributes.delete(name);
+    },
+    focus() {
+      document.activeElement = section;
+    },
   });
   const document = Object.assign(new Events(), {
     activeElement: null,
     documentElement: { clientWidth: width },
-    querySelectorAll: (selector) => selector === "[data-arc-scroll]" ? [section] : [outgoing],
+    querySelectorAll: (selector) =>
+      selector === "[data-arc-scroll]" ? [section] : [outgoing],
     querySelector: () => ({}),
-    getElementById: (id) => id === "contato" ? section : null,
+    getElementById: (id) => (id === "contato" ? section : null),
   });
-  const { ArcScrollReveal } = load(implementation, {
-    document, window, location, Event,
-    getComputedStyle: () => ({ backgroundColor: "rgb(236, 228, 219)", scrollPaddingTop: `${offset}px` }),
-    requestAnimationFrame: (callback) => { frames.set(++sequence, callback); return sequence; },
-    cancelAnimationFrame: (id) => frames.delete(id),
-    ResizeObserver: class { observe() {} disconnect() { disconnected = true; } },
-  }, { react: { useLayoutEffect: (callback) => { cleanup = callback(); } }, "./scroll-scene": policy });
+  const { ArcScrollReveal } = load(
+    implementation,
+    {
+      document,
+      window,
+      location,
+      Event,
+      getComputedStyle: () => ({
+        backgroundColor: "rgb(236, 228, 219)",
+        scrollPaddingTop: `${offset}px`,
+      }),
+      requestAnimationFrame: (callback) => {
+        frames.set(++sequence, callback);
+        return sequence;
+      },
+      cancelAnimationFrame: (id) => frames.delete(id),
+      ResizeObserver: class {
+        observe() {}
+        disconnect() {
+          disconnected = true;
+        }
+      },
+    },
+    {
+      react: {
+        useLayoutEffect: (callback) => {
+          cleanup = callback();
+        },
+      },
+      "./scroll-scene": policy,
+    },
+  );
   ArcScrollReveal();
   const flush = () => {
     const callbacks = [...frames.values()];
@@ -202,7 +364,20 @@ function mount({ height = 900, width = 1440, offset = 110, hash = "", reduced = 
     assert.equal(frames.size, 1, "scroll events coalesce into one frame");
     flush();
   };
-  return { window, media, document, location, content, focusedChild, surface, section, outgoing, frames, metrics, flush, scroll,
+  return {
+    window,
+    media,
+    document,
+    location,
+    content,
+    focusedChild,
+    surface,
+    section,
+    outgoing,
+    frames,
+    metrics,
+    flush,
+    scroll,
     destroy() {
       cleanup();
       assert.ok(disconnected);
@@ -222,7 +397,12 @@ test("settled arcs perform no repeated descendant queries or style/attribute wri
     page.scroll(2500);
     const before = { ...page.metrics };
     for (let index = 0; index < 120; index++) page.scroll(2600 + index);
-    const delta = Object.fromEntries(Object.entries(page.metrics).map(([key, value]) => [key, value - before[key]]));
+    const delta = Object.fromEntries(
+      Object.entries(page.metrics).map(([key, value]) => [
+        key,
+        value - before[key],
+      ]),
+    );
     page.destroy();
     return delta;
   }
@@ -230,7 +410,9 @@ test("settled arcs perform no repeated descendant queries or style/attribute wri
   assert.deepEqual(current, { queries: 0, styleWrites: 0, attributeWrites: 0 });
   if (process.env.HAIR_STUDIO_ARC_BASELINE) {
     const baseline = sample(process.env.HAIR_STUDIO_ARC_BASELINE);
-    context.diagnostic(`120 simulated settled scroll frames: before=${JSON.stringify(baseline)}; after=${JSON.stringify(current)}. These are operation counts, not browser frame timings.`);
+    context.diagnostic(
+      `120 simulated settled scroll frames: before=${JSON.stringify(baseline)}; after=${JSON.stringify(current)}. These are operation counts, not browser frame timings.`,
+    );
   }
 });
 
@@ -256,7 +438,10 @@ test("native progress settles immediately across large jumps and reversals", () 
   const page = mount();
   for (const scroll of [0, 1300, 1950, 5000, 1700, 0, 2000]) {
     page.scroll(scroll);
-    assert.equal(page.content.inert, policy.sceneProgress(2000, scroll, 900) < 0.78);
+    assert.equal(
+      page.content.inert,
+      policy.sceneProgress(2000, scroll, 900) < 0.78,
+    );
   }
   page.destroy();
 });
@@ -279,7 +464,11 @@ test("content exposure follows the covered arc and reverses with scroll", () => 
 });
 
 test("arc content opacity and position reverse from the same scroll progress", () => {
-  const target = { dataset: { reveal: "fadeUp" }, style: style(), parentElement: null };
+  const target = {
+    dataset: { reveal: "fadeUp" },
+    style: style(),
+    parentElement: null,
+  };
   const page = mount({ arcTargets: [target] });
   const move = (progress) => page.scroll(2000 - 900 * (1 - progress));
   move(0.78);
@@ -297,7 +486,10 @@ test("arc content opacity and position reverse from the same scroll progress", (
 });
 
 test("contact landing exposes content at the header offset on short and tall screens", () => {
-  for (const [width, offset] of [[1440, 110], [390, 90]]) {
+  for (const [width, offset] of [
+    [1440, 110],
+    [390, 90],
+  ]) {
     for (const height of [320, 390, 600, 844, 900, 1200]) {
       const page = mount({ height, width, offset, hash: "#contato" });
       page.scroll(2000 - offset);
@@ -349,62 +541,126 @@ test("exit opacity follows visual departure, including stationary sticky content
   assert.equal(policy.visualExitProgress(-18, 900), 1);
 });
 
-function mountReveal({ scene = true, overlay = false, top = 730, bottom = 830, imageReveal = false, implementation = "shared/ui/Reveal.tsx" } = {}) {
+function mountReveal({
+  scene = true,
+  overlay = false,
+  top = 730,
+  bottom = 830,
+  imageReveal = false,
+  implementation = "shared/ui/Reveal.tsx",
+} = {}) {
   const metrics = { layoutReads: 0, closestQueries: 0, exitWrites: 0 };
-  const image = {}, imageLayer = {};
-  const timelines = [], exits = [], triggers = [], frames = new Map();
+  const image = {},
+    imageLayer = {};
+  const timelines = [],
+    exits = [],
+    triggers = [],
+    frames = new Map();
   const mode = { motion: true, mobile: false };
-  let cleanup, mediaCleanup, mediaCallback, sequence = 0, refreshes = 0;
+  let cleanup,
+    mediaCleanup,
+    mediaCallback,
+    sequence = 0,
+    refreshes = 0;
   let bounds = { top, bottom, width: 300, height: 100 };
   let covered = overlay;
   const arc = { dataset: { arcContentVisible: "false" } };
   const main = { contains: () => true };
   const element = {
-    dataset: { reveal: imageReveal ? "imageReveal" : "fadeUp", revealStart: "clamp(top 76%)" },
-    parentElement: { closest: () => null }, isConnected: true,
+    dataset: {
+      reveal: imageReveal ? "imageReveal" : "fadeUp",
+      revealStart: "clamp(top 76%)",
+    },
+    parentElement: { closest: () => null },
+    isConnected: true,
     closest(selector) {
       metrics.closestQueries++;
       if (selector === "[data-arc-scroll]") return scene ? arc : null;
-      if (selector === "[data-arc-content]" || selector === "[data-arc-scene]") return scene ? main : null;
+      if (selector === "[data-arc-content]" || selector === "[data-arc-scene]")
+        return scene ? main : null;
       return null;
     },
-    matches: () => false, contains: () => false,
-    getBoundingClientRect: () => { metrics.layoutReads++; return bounds; },
-    querySelector: (selector) => !imageReveal ? null : selector === "img" ? image : imageLayer,
+    matches: () => false,
+    contains: () => false,
+    getBoundingClientRect: () => {
+      metrics.layoutReads++;
+      return bounds;
+    },
+    querySelector: (selector) =>
+      !imageReveal ? null : selector === "img" ? image : imageLayer,
   };
   const fonts = Object.assign(new Events(), { ready: Promise.resolve() });
   const document = Object.assign(new Events(), {
-    activeElement: null, documentElement: { scrollHeight: 6000 }, fonts,
-    querySelector: (selector) => selector === "main" ? main : covered ? {} : null,
-    querySelectorAll: (selector) => selector.includes("data-arc-outgoing") ? [] : [element],
+    activeElement: null,
+    documentElement: { scrollHeight: 6000 },
+    fonts,
+    querySelector: (selector) =>
+      selector === "main" ? main : covered ? {} : null,
+    querySelectorAll: (selector) =>
+      selector.includes("data-arc-outgoing") ? [] : [element],
   });
   const window = Object.assign(new Events(), {
-    innerHeight: 900, scrollY: 0,
-    matchMedia: (query) => ({ matches: query.includes("reduce)") ? !mode.motion : mode.mobile }),
+    innerHeight: 900,
+    scrollY: 0,
+    matchMedia: (query) => ({
+      matches: query.includes("reduce)") ? !mode.motion : mode.mobile,
+    }),
   });
   const triggerEvents = new Events();
   const ScrollTrigger = {
     create(options) {
-      assert.equal(scene, false, "sticky reveals must not create document-position triggers");
-      const trigger = { start: 700, options, killed: false, kill() { this.killed = true; } };
+      assert.equal(
+        scene,
+        false,
+        "sticky reveals must not create document-position triggers",
+      );
+      const trigger = {
+        start: 700,
+        options,
+        killed: false,
+        kill() {
+          this.killed = true;
+        },
+      };
       triggers.push(trigger);
       return trigger;
     },
-    refresh() { refreshes++; triggerEvents.dispatchEvent(new Event("refresh")); },
+    refresh() {
+      refreshes++;
+      triggerEvents.dispatchEvent(new Event("refresh"));
+    },
     addEventListener: (...args) => triggerEvents.addEventListener(...args),
-    removeEventListener: (...args) => triggerEvents.removeEventListener(...args),
+    removeEventListener: (...args) =>
+      triggerEvents.removeEventListener(...args),
   };
   const gsap = {
     registerPlugin() {},
     matchMedia: () => ({
-      add: (_, callback) => { mediaCallback = callback; mediaCleanup = callback({ conditions: mode }); },
+      add: (_, callback) => {
+        mediaCallback = callback;
+        mediaCleanup = callback({ conditions: mode });
+      },
       revert: () => mediaCleanup?.(),
     }),
     timeline() {
       const timeline = {
-        plays: 0, pausedValue: true, delayValue: 0, reverted: false, value: 0, callbacks: {}, targets: [],
-        fromTo(target, from, options) { this.targets.push(target); this.from = from; this.complete = options.onComplete; return this; },
-        eventCallback(name, callback) { this.callbacks[name] = callback; return this; },
+        plays: 0,
+        pausedValue: true,
+        delayValue: 0,
+        reverted: false,
+        value: 0,
+        callbacks: {},
+        targets: [],
+        fromTo(target, from, options) {
+          this.targets.push(target);
+          this.from = from;
+          this.complete = options.onComplete;
+          return this;
+        },
+        eventCallback(name, callback) {
+          this.callbacks[name] = callback;
+          return this;
+        },
         progress(value, suppress = false) {
           if (value === undefined) return this.value;
           this.value = value;
@@ -412,45 +668,114 @@ function mountReveal({ scene = true, overlay = false, top = 730, bottom = 830, i
           if (value === 1 && !suppress) this.complete();
           return this;
         },
-        play() { this.plays++; this.pausedValue = false; },
-        paused(value) { this.pausedValue = value; },
-        delay(value) { if (value === undefined) return this.delayValue; this.delayValue = value; return this; },
-        revert() { this.reverted = true; },
+        play() {
+          this.plays++;
+          this.pausedValue = false;
+        },
+        paused(value) {
+          this.pausedValue = value;
+        },
+        delay(value) {
+          if (value === undefined) return this.delayValue;
+          this.delayValue = value;
+          return this;
+        },
+        revert() {
+          this.reverted = true;
+        },
       };
       timelines.push(timeline);
       return timeline;
     },
     fromTo(_, __, options) {
       assert.equal(options.paused, scene);
-      const exit = { value: 0, progress(value) { metrics.exitWrites++; this.value = value; }, revert() {} };
+      const exit = {
+        value: 0,
+        progress(value) {
+          metrics.exitWrites++;
+          this.value = value;
+        },
+        revert() {},
+      };
       exits.push(exit);
       return exit;
     },
   };
-  const { Reveal } = load(implementation, {
-    document, window, Event, Element: class {}, performance: { now: () => 0 },
-    requestAnimationFrame: (callback) => { frames.set(++sequence, callback); return sequence; },
-    cancelAnimationFrame: (id) => frames.delete(id),
-    MutationObserver: class { observe() {} disconnect() {} },
-    ResizeObserver: class { observe() {} disconnect() {} },
-  }, {
-    "next/navigation": { usePathname: () => "/" },
-    "@gsap/react": { useGSAP: (callback) => { cleanup = callback(); } },
-    gsap: { default: gsap }, "gsap/ScrollTrigger": { ScrollTrigger },
-    "./scroll-scene": policy,
-    "./reveal/presets": load("shared/ui/reveal/presets.ts"),
-    "./reveal/eligibility": load("shared/ui/reveal/eligibility.ts"),
-    "./page-transition/readiness": load("shared/ui/page-transition/readiness.ts", { document }),
-  });
+  const { Reveal } = load(
+    implementation,
+    {
+      document,
+      window,
+      Event,
+      Element: class {},
+      performance: { now: () => 0 },
+      requestAnimationFrame: (callback) => {
+        frames.set(++sequence, callback);
+        return sequence;
+      },
+      cancelAnimationFrame: (id) => frames.delete(id),
+      MutationObserver: class {
+        observe() {}
+        disconnect() {}
+      },
+      ResizeObserver: class {
+        observe() {}
+        disconnect() {}
+      },
+    },
+    {
+      "next/navigation": { usePathname: () => "/" },
+      "@gsap/react": {
+        useGSAP: (callback) => {
+          cleanup = callback();
+        },
+      },
+      gsap: { default: gsap },
+      "gsap/ScrollTrigger": { ScrollTrigger },
+      "./scroll-scene": policy,
+      "./reveal/presets": load("shared/ui/reveal/presets.ts"),
+      "./reveal/eligibility": load("shared/ui/reveal/eligibility.ts"),
+      "./page-transition/readiness": load(
+        "shared/ui/page-transition/readiness.ts",
+        { document },
+      ),
+    },
+  );
   Reveal();
   return {
-    document, window, arc, timelines, exits, triggers, frames, mode, metrics, image, imageLayer,
-    get refreshes() { return refreshes; },
-    set bounds(value) { bounds = { ...bounds, ...value }; },
-    set overlay(value) { covered = value; },
-    update() { document.dispatchEvent(new Event("arlete:scene-update")); },
-    rebuild(changes) { Object.assign(mode, changes); mediaCleanup?.(); mediaCleanup = mediaCallback({ conditions: mode }); },
-    flush() { const callbacks = [...frames.values()]; frames.clear(); callbacks.forEach((callback) => callback()); },
+    document,
+    window,
+    arc,
+    timelines,
+    exits,
+    triggers,
+    frames,
+    mode,
+    metrics,
+    image,
+    imageLayer,
+    get refreshes() {
+      return refreshes;
+    },
+    set bounds(value) {
+      bounds = { ...bounds, ...value };
+    },
+    set overlay(value) {
+      covered = value;
+    },
+    update() {
+      document.dispatchEvent(new Event("arlete:scene-update"));
+    },
+    rebuild(changes) {
+      Object.assign(mode, changes);
+      mediaCleanup?.();
+      mediaCleanup = mediaCallback({ conditions: mode });
+    },
+    flush() {
+      const callbacks = [...frames.values()];
+      frames.clear();
+      callbacks.forEach((callback) => callback());
+    },
     destroy() {
       cleanup();
       assert.equal(document.listeners.size, 0);
@@ -469,9 +794,16 @@ test("scene reveals avoid hidden/active entrance measurements and unchanged exit
     const delta = (action) => {
       const before = { ...page.metrics };
       action();
-      return Object.fromEntries(Object.entries(page.metrics).map(([key, value]) => [key, value - before[key]]));
+      return Object.fromEntries(
+        Object.entries(page.metrics).map(([key, value]) => [
+          key,
+          value - before[key],
+        ]),
+      );
     };
-    const update = () => { for (let index = 0; index < 20; index++) page.update(); };
+    const update = () => {
+      for (let index = 0; index < 20; index++) page.update();
+    };
     const hidden = delta(update);
     page.arc.dataset.arcContentVisible = "true";
     page.bounds = { top: 650 };
@@ -489,7 +821,9 @@ test("scene reveals avoid hidden/active entrance measurements and unchanged exit
   assert.equal(current.completed.closestQueries, 0);
   if (process.env.HAIR_STUDIO_REVEAL_BASELINE) {
     const baseline = sample(process.env.HAIR_STUDIO_REVEAL_BASELINE);
-    context.diagnostic(`20 simulated updates per state: before=${JSON.stringify(baseline)}; after=${JSON.stringify(current)}. Operation counts only, not browser profiling.`);
+    context.diagnostic(
+      `20 simulated updates per state: before=${JSON.stringify(baseline)}; after=${JSON.stringify(current)}. Operation counts only, not browser profiling.`,
+    );
   }
 });
 
@@ -506,7 +840,11 @@ test("sticky reveals respect exposure, pause without replay, and exit by visual 
   assert.equal(timeline.plays, 0);
   page.arc.dataset.arcContentVisible = "true";
   page.update();
-  assert.equal(timeline.plays, 0, "76% is not bypassed by the old 88% fallback");
+  assert.equal(
+    timeline.plays,
+    0,
+    "76% is not bypassed by the old 88% fallback",
+  );
   page.bounds = { top: 710 };
   page.update();
   assert.equal(timeline.plays, 1);
@@ -521,7 +859,11 @@ test("sticky reveals respect exposure, pause without replay, and exit by visual 
   timeline.complete();
   page.window.scrollY = 4000;
   page.update();
-  assert.equal(page.exits[0].value, 0, "document movement cannot fade stationary sticky content");
+  assert.equal(
+    page.exits[0].value,
+    0,
+    "document movement cannot fade stationary sticky content",
+  );
   page.bounds = { bottom: 72 };
   page.update();
   assert.equal(page.exits[0].value, 0.5);
@@ -541,7 +883,11 @@ test("responsive rebuilds preserve in-progress and completed entrances", () => {
   const mobile = page.timelines.at(-1);
   assert.equal(mobile.from.y, 19.2);
   assert.equal(mobile.progress(), 0.4);
-  assert.equal(mobile.plays, 0, "in-progress entrance is resumed rather than replayed");
+  assert.equal(
+    mobile.plays,
+    0,
+    "in-progress entrance is resumed rather than replayed",
+  );
   mobile.complete();
   page.rebuild({ mobile: false });
   assert.equal(page.timelines.at(-1).reverted, true);
@@ -590,7 +936,11 @@ test("overlay release rechecks configured document triggers and batches refreshe
   assert.equal(page.frames.size, 1);
   page.flush();
   assert.equal(page.refreshes, 1);
-  assert.equal(page.timelines[0].plays, 0, "a stale onEnter cannot bypass the refreshed start");
+  assert.equal(
+    page.timelines[0].plays,
+    0,
+    "a stale onEnter cannot bypass the refreshed start",
+  );
   page.window.scrollY = 800;
   page.window.dispatchEvent(new Event("popstate"));
   page.flush();
@@ -600,7 +950,9 @@ test("overlay release rechecks configured document triggers and batches refreshe
 });
 
 test("scene eligibility respects clamp, configured edges and short viewports", () => {
-  const { sceneRevealEligible: eligible } = load("shared/ui/reveal/eligibility.ts");
+  const { sceneRevealEligible: eligible } = load(
+    "shared/ui/reveal/eligibility.ts",
+  );
   assert.equal(eligible(700, 100, "clamp(top 76%)", 900, 0, 5000), false);
   assert.equal(eligible(680, 100, "clamp(top 76%)", 900, 0, 5000), true);
   assert.equal(eligible(200, 100, "bottom center", 400, 0, 1000), false);
@@ -611,9 +963,12 @@ test("scene eligibility respects clamp, configured edges and short viewports", (
 
 test("page visibility starts once, immediately on direct loads and after overlay release", () => {
   const document = new Events();
-  let covered = true, starts = 0;
-  document.querySelector = () => covered ? {} : null;
-  const { whenPageVisible } = load("shared/ui/page-transition/readiness.ts", { document });
+  let covered = true,
+    starts = 0;
+  document.querySelector = () => (covered ? {} : null);
+  const { whenPageVisible } = load("shared/ui/page-transition/readiness.ts", {
+    document,
+  });
   const cancel = whenPageVisible(() => starts++);
   assert.equal(starts, 0);
   document.dispatchEvent(new Event("arlete:page-visible"));
@@ -636,17 +991,35 @@ test("page visibility starts once, immediately on direct loads and after overlay
 
 test("reviews server source handles success, empty, missing configuration and failures", async () => {
   const fetches = [];
-  const fixture = { reviews: [{ rating: 5, text: { text: "Test review fixture" }, authorAttribution: { displayName: "Test author" } }] };
-  function source({ env = { GOOGLE_MAPS_API_KEY: "test-key", GOOGLE_PLACE_ID: "test-place" }, response = fixture, ok = true, failure = false } = {}) {
-    return load("features/reviews/data/google-reviews.ts", {
-      process: { env }, URLSearchParams,
-      AbortSignal: { timeout: () => ({ deadline: true }) },
-      fetch: async (url, options) => {
-        fetches.push({ url, options });
-        if (failure) throw new Error("fixture network failure");
-        return { ok, json: async () => response };
+  const fixture = {
+    reviews: [
+      {
+        rating: 5,
+        text: { text: "Test review fixture" },
+        authorAttribution: { displayName: "Test author" },
       },
-    }, { "server-only": {} }).getGoogleReviews;
+    ],
+  };
+  function source({
+    env = { GOOGLE_MAPS_API_KEY: "test-key", GOOGLE_PLACE_ID: "test-place" },
+    response = fixture,
+    ok = true,
+    failure = false,
+  } = {}) {
+    return load(
+      "features/reviews/data/google-reviews.ts",
+      {
+        process: { env },
+        URLSearchParams,
+        AbortSignal: { timeout: () => ({ deadline: true }) },
+        fetch: async (url, options) => {
+          fetches.push({ url, options });
+          if (failure) throw new Error("fixture network failure");
+          return { ok, json: async () => response };
+        },
+      },
+      { "server-only": {} },
+    ).getGoogleReviews;
   }
   const success = await source()();
   assert.equal(success.status, 200);
@@ -657,7 +1030,11 @@ test("reviews server source handles success, empty, missing configuration and fa
   assert.equal(empty.body.reviews.length, 0);
   const count = fetches.length;
   assert.equal((await source({ env: {} })()).status, 500);
-  assert.equal(fetches.length, count, "missing configuration makes no provider request");
+  assert.equal(
+    fetches.length,
+    count,
+    "missing configuration makes no provider request",
+  );
   for (const config of [{ ok: false }, { failure: true }, { response: null }]) {
     const failed = await source(config)();
     assert.equal(failed.status, 502);
@@ -666,24 +1043,46 @@ test("reviews server source handles success, empty, missing configuration and fa
 });
 
 test("reviews render real data without duplicate accessibility content or empty sections", () => {
-  const { default: ReviewsSection } = load("features/reviews/components/ReviewsSection.tsx", {}, {
-    "react/jsx-runtime": jsxRuntime,
-    "@/components/ui/button": { Button: ({ children, render }) => createElement("a", { href: render.props.href }, children) },
-  });
+  const { default: ReviewsSection } = load(
+    "features/reviews/components/ReviewsSection.tsx",
+    {},
+    {
+      "react/jsx-runtime": jsxRuntime,
+      "@/components/ui/button": {
+        Button: ({ children, render }) =>
+          createElement("a", { href: render.props.href }, children),
+      },
+    },
+  );
   for (const data of [{ ok: false }, { ok: true, reviews: [] }]) {
     assert.equal(renderToStaticMarkup(ReviewsSection({ data })), "");
   }
   for (const count of [1, 2, 3, 4, 5, 6]) {
     const reviews = Array.from({ length: count }, (_, index) => ({
-      text: `Test review ${index}`, authorName: `Author ${index}`, rating: 5,
+      text: `Test review ${index}`,
+      authorName: `Author ${index}`,
+      rating: 5,
     }));
-    const html = renderToStaticMarkup(ReviewsSection({ data: {
-      ok: true, reviews, place: { googleMapsUri: "https://maps.google.com/example" },
-    } }));
+    const html = renderToStaticMarkup(
+      ReviewsSection({
+        data: {
+          ok: true,
+          reviews,
+          place: { googleMapsUri: "https://maps.google.com/example" },
+        },
+      }),
+    );
     assert.ok(html.includes('id="avaliacoes"'));
     assert.ok(html.includes("A beleza está nos"));
     assert.equal(html.includes("reviewRowAnimated"), count >= 2);
-    assert.equal((html.match(/class="reviewRow(?: reviewRowReverse)?(?: reviewRowAnimated)?"/g) ?? []).length, count >= 4 ? 2 : 1);
+    assert.equal(
+      (
+        html.match(
+          /class="reviewRow(?: reviewRowReverse)?(?: reviewRowAnimated)?"/g,
+        ) ?? []
+      ).length,
+      count >= 4 ? 2 : 1,
+    );
     assert.ok(html.includes("https://maps.google.com/example"));
     for (const review of reviews) assert.ok(html.includes(review.text));
     if (count >= 2) assert.ok(html.includes('aria-hidden="true"'));
@@ -694,49 +1093,98 @@ test("hero waits for visibility, settles restoration and never duplicates its en
   function mountHero({ covered = false, bottom = 800, motion = true } = {}) {
     const document = new Events();
     const state = { covered, motion };
-    document.querySelector = (selector) => selector === '.page-transition[data-active="true"]' && state.covered ? {} : null;
-    const stage = { dataset: {}, querySelectorAll: () => [], getBoundingClientRect: () => ({ bottom }) };
+    document.querySelector = (selector) =>
+      selector === '.page-transition[data-active="true"]' && state.covered
+        ? {}
+        : null;
+    const stage = {
+      dataset: {},
+      querySelectorAll: () => [],
+      getBoundingClientRect: () => ({ bottom }),
+    };
     const entered = { current: false };
     const timelines = [];
     let cleanup, mediaCleanup, mediaCallback;
     const gsap = {
       registerPlugin() {},
       matchMedia: () => ({
-        add: (_, callback) => { mediaCallback = callback; if (state.motion) mediaCleanup = callback(); },
+        add: (_, callback) => {
+          mediaCallback = callback;
+          if (state.motion) mediaCleanup = callback();
+        },
         revert: () => mediaCleanup?.(),
       }),
       timeline() {
         const timeline = {
-          plays: 0, value: 0, killed: false,
-          set() { return this; }, to() { return this; },
-          play() { this.plays++; }, progress(value) { this.value = value; },
-          kill() { this.killed = true; },
+          plays: 0,
+          value: 0,
+          killed: false,
+          set() {
+            return this;
+          },
+          to() {
+            return this;
+          },
+          play() {
+            this.plays++;
+          },
+          progress(value) {
+            this.value = value;
+          },
+          kill() {
+            this.killed = true;
+          },
         };
         timelines.push(timeline);
         return timeline;
       },
     };
     const stub = () => null;
-    const { Hero } = load("features/home/components/Hero.tsx", {
-      document,
-      window: { matchMedia: () => ({ matches: !state.motion }) },
-    }, {
-      "react/jsx-runtime": jsxRuntime,
-      react: { useRef: (value) => value === null ? { current: stage } : entered },
-      "next/image": { default: stub }, "next/link": { default: stub },
-      "@gsap/react": { useGSAP: (callback) => { cleanup = callback(); } }, gsap: { default: gsap },
-      "@/components/ui/button": { Button: stub },
-      "@/features/gallery/data/images": { heroTrailImages: [] },
-      "@/shared/ui/BookingLink": { BookingLink: stub },
-      "@/shared/ui/RotatingImageTrail": { RotatingImageTrail: stub },
-      "@/shared/ui/page-transition/readiness": load("shared/ui/page-transition/readiness.ts", { document }),
-    });
+    const { Hero } = load(
+      "features/home/components/Hero.tsx",
+      {
+        document,
+        window: { matchMedia: () => ({ matches: !state.motion }) },
+      },
+      {
+        "react/jsx-runtime": jsxRuntime,
+        react: {
+          useRef: (value) => (value === null ? { current: stage } : entered),
+        },
+        "next/image": { default: stub },
+        "next/link": { default: stub },
+        "@gsap/react": {
+          useGSAP: (callback) => {
+            cleanup = callback();
+          },
+        },
+        gsap: { default: gsap },
+        "@/components/ui/button": { Button: stub },
+        "@/features/gallery/data/images": { heroTrailImages: [] },
+        "@/shared/ui/BookingLink": { BookingLink: stub },
+        "@/shared/ui/RotatingImageTrail": { RotatingImageTrail: stub },
+        "@/shared/ui/page-transition/readiness": load(
+          "shared/ui/page-transition/readiness.ts",
+          { document },
+        ),
+      },
+    );
     Hero();
     return {
       timelines,
-      release() { state.covered = false; document.dispatchEvent(new Event("arlete:page-visible")); },
-      motion(value) { state.motion = value; mediaCleanup?.(); mediaCleanup = value ? mediaCallback() : undefined; },
-      destroy() { cleanup(); assert.equal(document.listeners.size, 0); },
+      release() {
+        state.covered = false;
+        document.dispatchEvent(new Event("arlete:page-visible"));
+      },
+      motion(value) {
+        state.motion = value;
+        mediaCleanup?.();
+        mediaCleanup = value ? mediaCallback() : undefined;
+      },
+      destroy() {
+        cleanup();
+        assert.equal(document.listeners.size, 0);
+      },
     };
   }
   const direct = mountHero();

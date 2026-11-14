@@ -62,7 +62,10 @@ export default async function HomePage() {
               <span id="contacto" />
               <div className={`booking-layout ${styles.bookingLayout}`}>
                 <div>
-                  <h2 data-reveal="maskedText" data-reveal-start="clamp(top 76%)">
+                  <h2
+                    data-reveal="maskedText"
+                    data-reveal-start="clamp(top 76%)"
+                  >
                     Vamos cuidar
                     <br />
                     <em>de ti?</em>
@@ -76,14 +79,30 @@ export default async function HomePage() {
                   <div data-reveal="cta" data-reveal-start="clamp(top 76%)">
                     <BookingLink>Conversar e marcar</BookingLink>
                   </div>
-                  <a data-reveal="cta" data-reveal-start="clamp(top 76%)" className={`booking-phone ${styles.bookingPhone}`} href={`tel:${site.phoneRaw}`}>
+                  <a
+                    data-reveal="cta"
+                    data-reveal-start="clamp(top 76%)"
+                    className={`booking-phone ${styles.bookingPhone}`}
+                    href={`tel:${site.phoneRaw}`}
+                  >
                     Ou liga: {site.phoneDisplay}
                   </a>
                 </div>
                 <div className={`location-card ${styles.locationCard}`}>
-                  <span className={`location-divider ${styles.locationDivider}`} data-reveal="fadeUp" aria-hidden="true" />
-                  <h3 data-reveal="maskedText" data-reveal-start="clamp(top 76%)">Campo de Ourique</h3>
-                  <p data-reveal="fadeUp" data-reveal-start="clamp(top 76%)">{site.addressLine}</p>
+                  <span
+                    className={`location-divider ${styles.locationDivider}`}
+                    data-reveal="fadeUp"
+                    aria-hidden="true"
+                  />
+                  <h3
+                    data-reveal="maskedText"
+                    data-reveal-start="clamp(top 76%)"
+                  >
+                    Campo de Ourique
+                  </h3>
+                  <p data-reveal="fadeUp" data-reveal-start="clamp(top 76%)">
+                    {site.addressLine}
+                  </p>
                   <p data-reveal="fadeUp" data-reveal-start="clamp(top 76%)">
                     Terça a sexta · 09:00–18:00
                     <br />
@@ -92,16 +111,20 @@ export default async function HomePage() {
                   <div data-reveal="cta" data-reveal-start="clamp(top 76%)">
                     <Button
                       variant="secondary"
-                      render={<a
-                        href="https://www.google.com/maps/search/?api=1&query=R.%20Silva%20Carvalho%2054B%20Lisboa"
-                        target="_blank"
-                        rel="noreferrer"
-                      />}
+                      render={
+                        <a
+                          href="https://www.google.com/maps/search/?api=1&query=R.%20Silva%20Carvalho%2054B%20Lisboa"
+                          target="_blank"
+                          rel="noreferrer"
+                        />
+                      }
                     >
                       Como chegar
                     </Button>
                   </div>
-                  <iframe data-reveal="fadeIn" data-reveal-start="clamp(top 76%)"
+                  <iframe
+                    data-reveal="fadeIn"
+                    data-reveal-start="clamp(top 76%)"
                     title="Localização do salão Ideias e Tranças"
                     src={site.googleMapsEmbedSrc}
                     loading="lazy"
@@ -132,9 +155,13 @@ export default async function HomePage() {
                   </div>
                   <div data-reveal="stagger" data-reveal-start="clamp(top 76%)">
                     <p>
-                      Descobre os serviços pensados para cuidar de ti, respeitar o teu estilo e valorizar a tua beleza.
+                      Descobre os serviços pensados para cuidar de ti, respeitar
+                      o teu estilo e valorizar a tua beleza.
                     </p>
-                    <Button variant="secondary" render={<Link href="/servicos#servicos-list" />}>
+                    <Button
+                      variant="secondary"
+                      render={<Link href="/servicos#servicos-list" />}
+                    >
                       Todos os serviços e valores{" "}
                     </Button>
                   </div>
@@ -145,7 +172,8 @@ export default async function HomePage() {
                       href={`/servicos?categoria=${s.category}#servicos-list`}
                       key={s.name}
                       className={styles.editorialService}
-                      data-reveal="fadeUp" data-reveal-start="clamp(top 76%)"
+                      data-reveal="fadeUp"
+                      data-reveal-start="clamp(top 76%)"
                     >
                       <div className={styles.servicePhoto}>
                         <Image
@@ -177,20 +205,37 @@ export default async function HomePage() {
           <div className={styles.careShell}>
             <header className={styles.careIntro}>
               <div className={styles.careHeading}>
-                <h2 id="care-title" data-reveal="fadeUp" data-reveal-start="clamp(top 76%)">
+                <h2
+                  id="care-title"
+                  data-reveal="fadeUp"
+                  data-reveal-start="clamp(top 76%)"
+                >
                   Da tua ideia ao <em>resultado.</em>
                 </h2>
-                <p>Três passos simples para encontrares o cuidado certo para ti.</p>
+                <p>
+                  Três passos simples para encontrares o cuidado certo para ti.
+                </p>
               </div>
             </header>
             <ol className={styles.careSteps}>
               {[
-                ["Conta-nos o que procuras", "Partilha a tua ideia ou uma fotografia de inspiração."],
-                ["Escolhemos juntas", "Conversamos sobre o teu cabelo e as opções mais adequadas."],
-                ["Combinamos o teu atendimento", "Definimos o serviço, a disponibilidade e o local."],
+                [
+                  "Conta-nos o que procuras",
+                  "Partilha a tua ideia ou uma fotografia de inspiração.",
+                ],
+                [
+                  "Escolhemos juntas",
+                  "Conversamos sobre o teu cabelo e as opções mais adequadas.",
+                ],
+                [
+                  "Combinamos o teu atendimento",
+                  "Definimos o serviço, a disponibilidade e o local.",
+                ],
               ].map(([title, description], index) => (
                 <li key={title}>
-                  <span className={styles.careStepNumber} aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                  <span className={styles.careStepNumber} aria-hidden="true">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
                   <div>
                     <h3>{title}</h3>
                     <p>{description}</p>
@@ -199,7 +244,18 @@ export default async function HomePage() {
               ))}
             </ol>
             <div className={styles.careFooter}>
-              <Button variant="inverse" className={styles.careCta} render={<a href={experienceWhatsAppHref} target="_blank" rel="noopener noreferrer" aria-label="Falar com a Arlete no WhatsApp (abre numa nova janela)" />}>
+              <Button
+                variant="inverse"
+                className={styles.careCta}
+                render={
+                  <a
+                    href={experienceWhatsAppHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Falar com a Arlete no WhatsApp (abre numa nova janela)"
+                  />
+                }
+              >
                 Falar com a Arlete
               </Button>
             </div>
@@ -215,9 +271,7 @@ export default async function HomePage() {
               </h2>
             </div>
             <div>
-              <p>
-                Uma seleção de trabalhos. Cada pessoa, uma nova inspiração.
-              </p>
+              <p>Uma seleção de trabalhos. Cada pessoa, uma nova inspiração.</p>
               <Button variant="secondary" render={<Link href="/galeria" />}>
                 Explorar a galeria
               </Button>
@@ -233,7 +287,6 @@ export default async function HomePage() {
                 href="/galeria"
                 key={p.src}
                 className={`portfolio-piece piece-${i} ${styles.portfolioPiece} ${i === 1 ? styles.piece1 : i === 2 ? styles.piece2 : ""}`}
-
               >
                 <div>
                   <span data-reveal-image>

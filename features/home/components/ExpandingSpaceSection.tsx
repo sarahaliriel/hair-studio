@@ -51,8 +51,7 @@ export function ExpandingSpaceSection() {
             {
               width: () => frameSize.offsetWidth,
               height: () => frameSize.offsetHeight,
-              borderRadius: () =>
-                getComputedStyle(frameSize).borderRadius,
+              borderRadius: () => getComputedStyle(frameSize).borderRadius,
             },
             {
               width: () => document.documentElement.clientWidth,
@@ -103,7 +102,8 @@ export function ExpandingSpaceSection() {
           });
         };
         const schedule = () => {
-          if (!frameRequest) frameRequest = requestAnimationFrame(() => render());
+          if (!frameRequest)
+            frameRequest = requestAnimationFrame(() => render());
         };
         const resize = () => {
           sectionTop = sectionDocumentTop();
@@ -145,90 +145,90 @@ export function ExpandingSpaceSection() {
         data-reveal="none"
         aria-label="O espaço"
       >
-      <div className={styles.spaceExpansionStage}>
-        <span
-          className={styles.spaceExpansionFrameSize}
-          data-space-frame-size
-          aria-hidden="true"
-        />
-        <div className={styles.spaceExpansionFrame} data-space-frame>
-          <Image
-            src="/images/editorial/coloracao-liso.webp"
-            alt="Modelo de costas com cabelo liso castanho iluminado"
-            fill
-            sizes="100vw"
-          />
-          <div
-            className={styles.spaceExpansionShade}
-            data-space-shade
+        <div className={styles.spaceExpansionStage}>
+          <span
+            className={styles.spaceExpansionFrameSize}
+            data-space-frame-size
             aria-hidden="true"
           />
-          <div className={styles.spaceExpansionContent} data-space-content>
-            <div className={styles.spaceExpansionBottom}>
-              <div className={styles.spaceExpansionCopy}>
-                <h2 data-space-reveal>Cuidado pensado para ti.</h2>
-                <p data-space-reveal>
-                  Cada atendimento é pessoal, calmo e feito com atenção ao teu
-                  estilo.
-                </p>
-              </div>
-              <div
-                className={styles.spaceExpansionThumbnails}
-                aria-label="Explora os serviços"
-              >
-                {[
-                  {
-                    src: "/images/gallery/02.png",
-                    label: "Tranças",
-                    category: "penteados",
-                    position: "center 38%",
-                  },
-                  {
-                    src: "/images/gallery/16.png",
-                    label: "Penteados",
-                    category: "penteados",
-                    position: "center 32%",
-                  },
-                  {
-                    src: "/images/gallery/003.png",
-                    label: "Ondas",
-                    category: "cabelo",
-                    position: "center 42%",
-                  },
-                ].map((item) => (
-                  <a
-                    key={item.label}
-                    href={`/servicos?categoria=${item.category}#servicos-list`}
-                    className={styles.spaceExpansionThumbnail}
-                    data-space-reveal
-                    aria-label={`Ver serviços de ${item.label.toLowerCase()}`}
-                  >
-                    <Image
-                      src={item.src}
-                      alt={item.label}
-                      fill
-                      sizes="(max-width: 700px) 28vw, 150px"
-                      style={{ objectPosition: item.position }}
-                    />
-                    <span>{item.label}</span>
-                    <span
-                      className={styles.spaceExpansionThumbnailArrow}
-                      aria-hidden="true"
+          <div className={styles.spaceExpansionFrame} data-space-frame>
+            <Image
+              src="/images/editorial/coloracao-liso.webp"
+              alt="Modelo de costas com cabelo liso castanho iluminado"
+              fill
+              sizes="100vw"
+            />
+            <div
+              className={styles.spaceExpansionShade}
+              data-space-shade
+              aria-hidden="true"
+            />
+            <div className={styles.spaceExpansionContent} data-space-content>
+              <div className={styles.spaceExpansionBottom}>
+                <div className={styles.spaceExpansionCopy}>
+                  <h2 data-space-reveal>Cuidado pensado para ti.</h2>
+                  <p data-space-reveal>
+                    Cada atendimento é pessoal, calmo e feito com atenção ao teu
+                    estilo.
+                  </p>
+                </div>
+                <div
+                  className={styles.spaceExpansionThumbnails}
+                  aria-label="Explora os serviços"
+                >
+                  {[
+                    {
+                      src: "/images/gallery/02.png",
+                      label: "Tranças",
+                      category: "penteados",
+                      position: "center 38%",
+                    },
+                    {
+                      src: "/images/gallery/16.png",
+                      label: "Penteados",
+                      category: "penteados",
+                      position: "center 32%",
+                    },
+                    {
+                      src: "/images/gallery/003.png",
+                      label: "Ondas",
+                      category: "cabelo",
+                      position: "center 42%",
+                    },
+                  ].map((item) => (
+                    <a
+                      key={item.label}
+                      href={`/servicos?categoria=${item.category}#servicos-list`}
+                      className={styles.spaceExpansionThumbnail}
+                      data-space-reveal
+                      aria-label={`Ver serviços de ${item.label.toLowerCase()}`}
                     >
-                      ↗
-                    </span>
-                  </a>
-                ))}
-              </div>
-              <div className={styles.spaceExpansionAction} data-space-reveal>
-                <Button variant="inverse" render={<a href="#contato" />}>
-                  Vamos conversar
-                </Button>
+                      <Image
+                        src={item.src}
+                        alt={item.label}
+                        fill
+                        sizes="(max-width: 700px) 28vw, 150px"
+                        style={{ objectPosition: item.position }}
+                      />
+                      <span>{item.label}</span>
+                      <span
+                        className={styles.spaceExpansionThumbnailArrow}
+                        aria-hidden="true"
+                      >
+                        ↗
+                      </span>
+                    </a>
+                  ))}
+                </div>
+                <div className={styles.spaceExpansionAction} data-space-reveal>
+                  <Button variant="inverse" render={<a href="#contato" />}>
+                    Vamos conversar
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
       </section>
     </>
   );

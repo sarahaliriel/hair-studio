@@ -17,20 +17,27 @@ const buttonVariants = cva(
         icon: "size-9 sm:size-8",
         "icon-lg": "size-10 sm:size-9",
         "icon-sm": "size-8 sm:size-7",
-        "icon-xl": "size-11 sm:size-10 [&_svg:not([class*='size-'])]:size-5 sm:[&_svg:not([class*='size-'])]:size-4.5",
-        "icon-xs": "size-7 rounded-md before:rounded-[calc(var(--radius-md)-1px)] sm:size-6 not-in-data-[slot=input-group]:[&_svg:not([class*='size-'])]:size-4 sm:not-in-data-[slot=input-group]:[&_svg:not([class*='size-'])]:size-3.5",
+        "icon-xl":
+          "size-11 sm:size-10 [&_svg:not([class*='size-'])]:size-5 sm:[&_svg:not([class*='size-'])]:size-4.5",
+        "icon-xs":
+          "size-7 rounded-md before:rounded-[calc(var(--radius-md)-1px)] sm:size-6 not-in-data-[slot=input-group]:[&_svg:not([class*='size-'])]:size-4 sm:not-in-data-[slot=input-group]:[&_svg:not([class*='size-'])]:size-3.5",
         lg: "h-10 px-[calc(--spacing(3.5)-1px)] sm:h-9",
         sm: "h-8 gap-1.5 px-[calc(--spacing(2.5)-1px)] sm:h-7",
         xl: "h-11 px-[calc(--spacing(4)-1px)] text-lg sm:h-10 sm:text-base [&_svg:not([class*='size-'])]:size-5 sm:[&_svg:not([class*='size-'])]:size-4.5",
         xs: "h-7 gap-1 rounded-md px-[calc(--spacing(2)-1px)] text-sm before:rounded-[calc(var(--radius-md)-1px)] sm:h-6 sm:text-xs [&_svg:not([class*='size-'])]:size-4 sm:[&_svg:not([class*='size-'])]:size-3.5",
       },
       variant: {
-        default: "not-disabled:inset-shadow-[0_1px_--theme(--color-white/16%)] border-primary bg-primary text-primary-foreground shadow-primary/24 shadow-xs [:active,[data-pressed]]:inset-shadow-[0_1px_--theme(--color-black/8%)] [:disabled,:active,[data-pressed]]:shadow-none [:hover,[data-pressed]]:bg-primary/90",
-        destructive: "not-disabled:inset-shadow-[0_1px_--theme(--color-white/16%)] border-destructive bg-destructive text-white shadow-destructive/24 shadow-xs [:active,[data-pressed]]:inset-shadow-[0_1px_--theme(--color-black/8%)] [:disabled,:active,[data-pressed]]:shadow-none [:hover,[data-pressed]]:bg-destructive/90",
-        "destructive-outline": "border-input bg-transparent not-dark:bg-clip-padding text-destructive-foreground shadow-xs/5 not-disabled:not-active:not-data-pressed:before:shadow-[0_1px_--theme(--color-black/6%)] dark:bg-input/32 dark:not-disabled:before:shadow-[0_-1px_--theme(--color-white/2%)] dark:not-disabled:not-active:not-data-pressed:before:shadow-[0_-1px_--theme(--color-white/6%)] [:disabled,:active,[data-pressed]]:shadow-none [:hover,[data-pressed]]:border-destructive/32 [:hover,[data-pressed]]:bg-destructive/4",
-        ghost: "border-transparent text-foreground data-pressed:bg-accent [:hover,[data-pressed]]:bg-accent",
+        default:
+          "not-disabled:inset-shadow-[0_1px_--theme(--color-white/16%)] border-primary bg-primary text-primary-foreground shadow-primary/24 shadow-xs [:active,[data-pressed]]:inset-shadow-[0_1px_--theme(--color-black/8%)] [:disabled,:active,[data-pressed]]:shadow-none [:hover,[data-pressed]]:bg-primary/90",
+        destructive:
+          "not-disabled:inset-shadow-[0_1px_--theme(--color-white/16%)] border-destructive bg-destructive text-white shadow-destructive/24 shadow-xs [:active,[data-pressed]]:inset-shadow-[0_1px_--theme(--color-black/8%)] [:disabled,:active,[data-pressed]]:shadow-none [:hover,[data-pressed]]:bg-destructive/90",
+        "destructive-outline":
+          "border-input bg-transparent not-dark:bg-clip-padding text-destructive-foreground shadow-xs/5 not-disabled:not-active:not-data-pressed:before:shadow-[0_1px_--theme(--color-black/6%)] dark:bg-input/32 dark:not-disabled:before:shadow-[0_-1px_--theme(--color-white/2%)] dark:not-disabled:not-active:not-data-pressed:before:shadow-[0_-1px_--theme(--color-white/6%)] [:disabled,:active,[data-pressed]]:shadow-none [:hover,[data-pressed]]:border-destructive/32 [:hover,[data-pressed]]:bg-destructive/4",
+        ghost:
+          "border-transparent text-foreground data-pressed:bg-accent [:hover,[data-pressed]]:bg-accent",
         link: "border-transparent underline-offset-4 [:hover,[data-pressed]]:underline",
-        outline: "border-input bg-background not-dark:bg-clip-padding text-foreground shadow-xs/5 not-disabled:not-active:not-data-pressed:before:shadow-[0_1px_--theme(--color-black/6%)] dark:bg-input/32 dark:not-disabled:before:shadow-[0_-1px_--theme(--color-white/2%)] dark:not-disabled:not-active:not-data-pressed:before:shadow-[0_-1px_--theme(--color-white/6%)] [:disabled,:active,[data-pressed]]:shadow-none [:hover,[data-pressed]]:bg-accent/50 dark:[:hover,[data-pressed]]:bg-input/64",
+        outline:
+          "border-input bg-background not-dark:bg-clip-padding text-foreground shadow-xs/5 not-disabled:not-active:not-data-pressed:before:shadow-[0_1px_--theme(--color-black/6%)] dark:bg-input/32 dark:not-disabled:before:shadow-[0_-1px_--theme(--color-white/2%)] dark:not-disabled:not-active:not-data-pressed:before:shadow-[0_-1px_--theme(--color-white/6%)] [:disabled,:active,[data-pressed]]:shadow-none [:hover,[data-pressed]]:bg-accent/50 dark:[:hover,[data-pressed]]:bg-input/64",
         secondary: "border-transparent bg-transparent text-primary",
         inverse: "border-transparent bg-transparent text-primary",
         "inverse-outline": "border-transparent bg-transparent text-primary",
@@ -48,11 +55,19 @@ interface ButtonProps extends useRender.ComponentProps<"button"> {
 }
 
 /** Decorative inside an existing link/button; never nests an interactive element. */
-function ArrowCircle({ className, direction = "up-right" }: {
+function ArrowCircle({
+  className,
+  direction = "up-right",
+}: {
   className?: string;
   direction?: ButtonProps["direction"];
 }) {
-  const Icon = { "up-right": ArrowUpRight, left: ArrowLeft, right: ArrowRight, down: ArrowDown }[direction];
+  const Icon = {
+    "up-right": ArrowUpRight,
+    left: ArrowLeft,
+    right: ArrowRight,
+    down: ArrowDown,
+  }[direction];
   return (
     <span className={cn("site-button-arrow", className)} aria-hidden="true">
       <Icon className="site-button-arrow-out" />
@@ -61,19 +76,45 @@ function ArrowCircle({ className, direction = "up-right" }: {
   );
 }
 
-function Button({ className, variant, size, render, animated = !size?.startsWith("icon"), direction, children, ...props }: ButtonProps) {
+function Button({
+  className,
+  variant,
+  size,
+  render,
+  animated = !size?.startsWith("icon"),
+  direction,
+  children,
+  ...props
+}: ButtonProps) {
   const isArrow = variant === "arrow";
   const isInverse = variant === "inverse" || variant === "inverse-outline";
-  const isSecondary = variant === "secondary" || variant === "outline" || variant === "inverse-outline";
+  const isSecondary =
+    variant === "secondary" ||
+    variant === "outline" ||
+    variant === "inverse-outline";
   const styled = animated || isArrow || isInverse;
-  const typeValue: React.ButtonHTMLAttributes<HTMLButtonElement>["type"] = render ? undefined : "button";
+  const typeValue: React.ButtonHTMLAttributes<HTMLButtonElement>["type"] =
+    render ? undefined : "button";
   const defaultProps = {
-    className: cn(buttonVariants({ size, variant }), styled && "site-button", styled && !animated && isInverse && "site-button-static", styled && isSecondary && "site-button-secondary", styled && variant === "inverse" && "site-button-inverse", styled && variant === "inverse-outline" && "site-button-inverse-outline", isArrow && "site-button-icon", className),
-    children: isArrow ? <ArrowCircle direction={direction} /> : animated ? (
+    className: cn(
+      buttonVariants({ size, variant }),
+      styled && "site-button",
+      styled && !animated && isInverse && "site-button-static",
+      styled && isSecondary && "site-button-secondary",
+      styled && variant === "inverse" && "site-button-inverse",
+      styled && variant === "inverse-outline" && "site-button-inverse-outline",
+      isArrow && "site-button-icon",
+      className,
+    ),
+    children: isArrow ? (
+      <ArrowCircle direction={direction} />
+    ) : animated ? (
       isSecondary ? (
         <span className="site-button-text-mask">
           <span className="site-button-text-out">{children}</span>
-          <span className="site-button-text-in" aria-hidden="true">{children}</span>
+          <span className="site-button-text-in" aria-hidden="true">
+            {children}
+          </span>
         </span>
       ) : (
         <>
@@ -81,11 +122,17 @@ function Button({ className, variant, size, render, animated = !size?.startsWith
           <ArrowCircle direction={direction} />
         </>
       )
-    ) : children,
+    ) : (
+      children
+    ),
     "data-slot": "button",
     type: typeValue,
   };
-  return useRender({ defaultTagName: "button", props: mergeProps<"button">(defaultProps, props), render });
+  return useRender({
+    defaultTagName: "button",
+    props: mergeProps<"button">(defaultProps, props),
+    render,
+  });
 }
 
 export { Button, ArrowCircle, buttonVariants };

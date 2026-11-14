@@ -8,14 +8,26 @@ import * as jsxRuntime from "react/jsx-runtime";
 
 function load(file, globals, dependencies) {
   const code = ts.transpileModule(fs.readFileSync(file, "utf8"), {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, jsx: ts.JsxEmit.ReactJSX },
+    compilerOptions: {
+      module: ts.ModuleKind.CommonJS,
+      target: ts.ScriptTarget.ES2020,
+      jsx: ts.JsxEmit.ReactJSX,
+    },
   }).outputText;
   const compiled = { exports: {} };
-  vm.runInNewContext(code, {
-    module: compiled, exports: compiled.exports,
-    require(name) { assert.ok(name in dependencies, name); return dependencies[name]; },
-    ...globals,
-  }, { filename: file });
+  vm.runInNewContext(
+    code,
+    {
+      module: compiled,
+      exports: compiled.exports,
+      require(name) {
+        assert.ok(name in dependencies, name);
+        return dependencies[name];
+      },
+      ...globals,
+    },
+    { filename: file },
+  );
   return compiled.exports;
 }
 
@@ -29,31 +41,58 @@ class Events {
     this.listeners.get(name)?.delete(callback);
     if (!this.listeners.get(name)?.size) this.listeners.delete(name);
   }
-  emit(name, fields = {}) { this.listeners.get(name)?.forEach((callback) => callback({ type: name, ...fields })); }
+  emit(name, fields = {}) {
+    this.listeners
+      .get(name)
+      ?.forEach((callback) => callback({ type: name, ...fields }));
+  }
 }
 
 function mountTrail({ fine = true, reduced = false } = {}) {
-  let cleanup, intersection, disconnected = false, sequence = 0, reads = 0;
+  let cleanup,
+    intersection,
+    disconnected = false,
+    sequence = 0,
+    reads = 0;
   let now = 0;
   let bounds = { top: 100, left: 0, width: 800, height: 700 };
-  const frames = new Map(), timelines = [], decodes = [];
+  const frames = new Map(),
+    timelines = [],
+    decodes = [];
   const document = Object.assign(new Events(), { hidden: false });
   const window = new Events();
   const finePointer = Object.assign(new Events(), { matches: fine });
   const reducedMotion = Object.assign(new Events(), { matches: reduced });
-  const hero = Object.assign(new Events(), { getBoundingClientRect() { reads++; return bounds; } });
+  const hero = Object.assign(new Events(), {
+    getBoundingClientRect() {
+      reads++;
+      return bounds;
+    },
+  });
   const layer = {
-    parentElement: hero, children: [],
-    appendChild(photo) { this.children.push(photo); },
-    replaceChildren() { this.children.length = 0; },
+    parentElement: hero,
+    children: [],
+    appendChild(photo) {
+      this.children.push(photo);
+    },
+    replaceChildren() {
+      this.children.length = 0;
+    },
   };
-  document.createElement = () => ({ style: {},
-    remove() { const index = layer.children.indexOf(this); if (index !== -1) layer.children.splice(index, 1); },
+  document.createElement = () => ({
+    style: {},
+    remove() {
+      const index = layer.children.indexOf(this);
+      if (index !== -1) layer.children.splice(index, 1);
+    },
   });
   class PreloadImage {
     decode() {
       let resolve, reject;
-      const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
+      const promise = new Promise((yes, no) => {
+        resolve = yes;
+        reject = no;
+      });
       decodes.push({ source: this.src, resolve, reject, promise });
       return promise;
     }
@@ -61,38 +100,106 @@ function mountTrail({ fine = true, reduced = false } = {}) {
   const gsap = {
     timeline(options) {
       const timeline = {
-        options, killed: false, steps: [],
-        fromTo(photo, from, to) { this.photo = photo; this.initial = from; this.steps.push(to); return this; },
-        to(_, to) { this.steps.push(to); return this; },
-        kill() { this.killed = true; },
+        options,
+        killed: false,
+        steps: [],
+        fromTo(photo, from, to) {
+          this.photo = photo;
+          this.initial = from;
+          this.steps.push(to);
+          return this;
+        },
+        to(_, to) {
+          this.steps.push(to);
+          return this;
+        },
+        kill() {
+          this.killed = true;
+        },
       };
       timelines.push(timeline);
       return timeline;
     },
   };
-  const { RotatingImageTrail } = load("shared/ui/RotatingImageTrail.tsx", {
-    document, window, Image: PreloadImage, performance: { now: () => now },
-    matchMedia: (query) => query.includes("reduce") ? reducedMotion : finePointer,
-    requestAnimationFrame: (callback) => { frames.set(++sequence, callback); return sequence; },
-    cancelAnimationFrame: (id) => frames.delete(id),
-    IntersectionObserver: class { constructor(callback) { intersection = callback; } observe() {} disconnect() { disconnected = true; } },
-  }, {
-    react: { useRef: () => ({ current: layer }), useEffect: (callback) => { cleanup = callback(); } },
-    "react/jsx-runtime": jsxRuntime,
-    gsap: { gsap }, "next/image": { getImageProps: ({ src }) => ({ props: { src } }) },
-    "./RotatingImageTrail.module.css": { default: { layer: "layer", photo: "photo" } },
+  const { RotatingImageTrail } = load(
+    "shared/ui/RotatingImageTrail.tsx",
+    {
+      document,
+      window,
+      Image: PreloadImage,
+      performance: { now: () => now },
+      matchMedia: (query) =>
+        query.includes("reduce") ? reducedMotion : finePointer,
+      requestAnimationFrame: (callback) => {
+        frames.set(++sequence, callback);
+        return sequence;
+      },
+      cancelAnimationFrame: (id) => frames.delete(id),
+      IntersectionObserver: class {
+        constructor(callback) {
+          intersection = callback;
+        }
+        observe() {}
+        disconnect() {
+          disconnected = true;
+        }
+      },
+    },
+    {
+      react: {
+        useRef: () => ({ current: layer }),
+        useEffect: (callback) => {
+          cleanup = callback();
+        },
+      },
+      "react/jsx-runtime": jsxRuntime,
+      gsap: { gsap },
+      "next/image": { getImageProps: ({ src }) => ({ props: { src } }) },
+      "./RotatingImageTrail.module.css": {
+        default: { layer: "layer", photo: "photo" },
+      },
+    },
+  );
+  const element = RotatingImageTrail({
+    images: [{ src: "a" }, { src: "b" }, { src: "c" }],
   });
-  const element = RotatingImageTrail({ images: [{ src: "a" }, { src: "b" }, { src: "c" }] });
   return {
-    document, window, hero, finePointer, reducedMotion, frames, timelines, decodes, layer, element,
-    get reads() { return reads; },
-    advance(ms) { now += ms; },
-    set bounds(value) { bounds = { ...bounds, ...value }; },
-    visible(value) { intersection([{ isIntersecting: value }]); },
-    move(x, y = 200, pointerType = "mouse") { hero.emit("pointermove", { clientX: x, clientY: y, pointerType }); },
-    flush() { const callbacks = [...frames.values()]; frames.clear(); callbacks.forEach((callback) => callback()); },
+    document,
+    window,
+    hero,
+    finePointer,
+    reducedMotion,
+    frames,
+    timelines,
+    decodes,
+    layer,
+    element,
+    get reads() {
+      return reads;
+    },
+    advance(ms) {
+      now += ms;
+    },
+    set bounds(value) {
+      bounds = { ...bounds, ...value };
+    },
+    visible(value) {
+      intersection([{ isIntersecting: value }]);
+    },
+    move(x, y = 200, pointerType = "mouse") {
+      hero.emit("pointermove", { clientX: x, clientY: y, pointerType });
+    },
+    flush() {
+      const callbacks = [...frames.values()];
+      frames.clear();
+      callbacks.forEach((callback) => callback());
+    },
     async decoded({ failFirst = false } = {}) {
-      decodes.forEach((decode, index) => failFirst && index === 0 ? decode.reject(new Error("fixture decode failure")) : decode.resolve());
+      decodes.forEach((decode, index) =>
+        failFirst && index === 0
+          ? decode.reject(new Error("fixture decode failure"))
+          : decode.resolve(),
+      );
       await Promise.allSettled(decodes.map((decode) => decode.promise));
     },
     destroy() {
@@ -134,7 +241,10 @@ test("trail deduplicates pending decodes and coalesces burst input into one fram
   page.flush();
   assert.equal(page.reads, 1);
   assert.equal(page.timelines.length, 1);
-  assert.deepEqual(page.timelines[0].steps.map((step) => step.duration), [0.4, 0.4, 0.4, 0.3, 0.3, 0.2, 0.5]);
+  assert.deepEqual(
+    page.timelines[0].steps.map((step) => step.duration),
+    [0.4, 0.4, 0.4, 0.3, 0.3, 0.2, 0.5],
+  );
   assert.equal(page.timelines[0].photo.style.opacity, "0");
   assert.equal(page.timelines[0].steps.at(-2).opacity, 1);
   assert.equal(page.timelines[0].steps.at(-1).opacity, 0);
@@ -168,7 +278,11 @@ test("trail requires 120px and 700ms together without banking cooldown movement"
   assert.equal(page.timelines.length, 1);
   page.advance(1);
   page.flush();
-  assert.equal(page.timelines.length, 1, "cooldown expiry does not create a queued image");
+  assert.equal(
+    page.timelines.length,
+    1,
+    "cooldown expiry does not create a queued image",
+  );
   page.move(450);
   page.flush();
   assert.equal(page.timelines.length, 1);
@@ -225,14 +339,18 @@ test("trail responds to live capability/tab changes and late decode completion a
   page.finePointer.emit("change");
   assert.equal(page.decodes.length, 3);
   await page.decoded();
-  page.move(100); page.move(400); page.flush();
+  page.move(100);
+  page.move(400);
+  page.flush();
   page.document.hidden = true;
   page.document.emit("visibilitychange");
   assert.equal(page.layer.children.length, 0);
   page.document.hidden = false;
   page.document.emit("visibilitychange");
   page.advance(700);
-  page.move(100); page.move(400); page.flush();
+  page.move(100);
+  page.move(400);
+  page.flush();
   page.reducedMotion.matches = true;
   page.reducedMotion.emit("change");
   assert.equal(page.layer.children.length, 0);
@@ -248,7 +366,9 @@ test("a failed trail image does not block decoded sources", async () => {
   const page = mountTrail();
   page.visible(true);
   await page.decoded({ failFirst: true });
-  page.move(100); page.move(400); page.flush();
+  page.move(100);
+  page.move(400);
+  page.flush();
   assert.equal(page.layer.children[0].src, "b");
   page.destroy();
 });
@@ -256,16 +376,47 @@ test("a failed trail image does not block decoded sources", async () => {
 test("marquee only changes play eligibility and cleans up viewport/tab/preference observers", () => {
   const document = Object.assign(new Events(), { hidden: false });
   const reduced = Object.assign(new Events(), { matches: false });
-  let cleanup, intersection, disconnected = false;
-  const track = { dataset: {}, style: new Proxy({}, { set() { assert.fail("marquee JS must not reset the CSS animation"); } }) };
+  let cleanup,
+    intersection,
+    disconnected = false;
+  const track = {
+    dataset: {},
+    style: new Proxy(
+      {},
+      {
+        set() {
+          assert.fail("marquee JS must not reset the CSS animation");
+        },
+      },
+    ),
+  };
   const section = { querySelector: () => track };
-  const { BrandsMarquee } = load("features/home/components/BrandsMarquee.tsx", {
-    document, matchMedia: () => reduced,
-    IntersectionObserver: class { constructor(callback) { intersection = callback; } observe() {} disconnect() { disconnected = true; } },
-  }, {
-    react: { useRef: () => ({ current: section }), useEffect: (callback) => { cleanup = callback(); } },
-    "react/jsx-runtime": jsxRuntime, "next/image": { default: () => null },
-  });
+  const { BrandsMarquee } = load(
+    "features/home/components/BrandsMarquee.tsx",
+    {
+      document,
+      matchMedia: () => reduced,
+      IntersectionObserver: class {
+        constructor(callback) {
+          intersection = callback;
+        }
+        observe() {}
+        disconnect() {
+          disconnected = true;
+        }
+      },
+    },
+    {
+      react: {
+        useRef: () => ({ current: section }),
+        useEffect: (callback) => {
+          cleanup = callback();
+        },
+      },
+      "react/jsx-runtime": jsxRuntime,
+      "next/image": { default: () => null },
+    },
+  );
   BrandsMarquee();
   assert.equal(track.dataset.running, "false");
   intersection([{ isIntersecting: true }]);

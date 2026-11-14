@@ -5,7 +5,7 @@ import { site } from "@/config/Site";
 
 function waLink() {
   const text = encodeURIComponent(
-    `Olá! Gostava de marcar um atendimento. 😊\n\nServiço: \nData/horário preferidos: \nLocal: Salão / Domicílio\n\nNome: `
+    `Olá! Gostava de marcar um atendimento. 😊\n\nServiço: \nData/horário preferidos: \nLocal: Salão / Domicílio\n\nNome: `,
   );
   return `https://wa.me/${site.whatsappRaw}?text=${text}`;
 }
@@ -31,7 +31,8 @@ export function BookingLocationSection() {
             </h3>
 
             <p className="mt-3 text-sm leading-relaxed text-[#2f2d2d]/75">
-              Diz-me o serviço, a data e se preferes salão ou domicílio. Se tiveres uma referência, envia também.
+              Diz-me o serviço, a data e se preferes salão ou domicílio. Se
+              tiveres uma referência, envia também.
             </p>
 
             <div className="mt-6">
@@ -60,7 +61,6 @@ export function BookingLocationSection() {
             <div className="mt-6 rounded-2xl border border-black/10 bg-white/30 p-4 text-xs text-[#2f2d2d]/70">
               <p className="mt-1">Atendimento em salão ou domicílio</p>
             </div>
-
           </div>
 
           <div className="glass soft-card overflow-hidden">
@@ -76,7 +76,6 @@ export function BookingLocationSection() {
               <p className="mt-3 text-sm leading-relaxed text-[#2f2d2d]/75">
                 {site.addressLine}
               </p>
-
             </div>
 
             <div className="h-52 w-full border-t border-black/10 bg-[#edeae2] md:h-60">

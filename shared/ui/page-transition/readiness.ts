@@ -1,7 +1,9 @@
 /** The overlay remains the single source of truth for destination visibility. */
 export function pageTransitionActive() {
-  return !!document.querySelector('.page-transition[data-active="true"]') ||
-    !!document.querySelector('[data-home-intro][data-active="true"]');
+  return (
+    !!document.querySelector('.page-transition[data-active="true"]') ||
+    !!document.querySelector('[data-home-intro][data-active="true"]')
+  );
 }
 
 export function whenPageVisible(callback: () => void) {

@@ -30,15 +30,28 @@ export function ArcScrollReveal() {
     // scroll frames, visibility changes, or completed-scene cleanup.
     const geometry = sections.map((section) => {
       const content = section.querySelector<HTMLElement>("[data-arc-content]");
-      const groups = Array.from(content?.querySelectorAll<HTMLElement>("[data-reveal]") ?? [])
-        .filter((element) => !element.parentElement?.closest("[data-reveal]"));
-      const targets = groups.flatMap((element) => element.dataset.reveal === "stagger"
-        ? Array.from(element.children).filter((child): child is HTMLElement => child instanceof HTMLElement)
-        : [element]);
+      const groups = Array.from(
+        content?.querySelectorAll<HTMLElement>("[data-reveal]") ?? [],
+      ).filter((element) => !element.parentElement?.closest("[data-reveal]"));
+      const targets = groups.flatMap((element) =>
+        element.dataset.reveal === "stagger"
+          ? Array.from(element.children).filter(
+              (child): child is HTMLElement => child instanceof HTMLElement,
+            )
+          : [element],
+      );
       return {
-        section, top: 0, content, targets, contentProgress: -1,
+        section,
+        top: 0,
+        content,
+        targets,
+        contentProgress: -1,
         surface: section.querySelector<HTMLElement>("[data-arc-surface]")!,
-        cleared: false, active: false, q: -1, display: "", path: "",
+        cleared: false,
+        active: false,
+        q: -1,
+        display: "",
+        path: "",
       };
     });
     type Scene = (typeof geometry)[number];
@@ -46,19 +59,25 @@ export function ArcScrollReveal() {
     const previousTabIndex = new Map<HTMLElement, string | null>();
 
     // This signal gates child entrances only; it never changes the arc's geometry.
-    const setContentVisible = ({ section, content }: Scene, visible: boolean) => {
+    const setContentVisible = (
+      { section, content }: Scene,
+      visible: boolean,
+    ) => {
       const value = String(visible);
       if (section.dataset.arcContentVisible === value) return;
       if (!visible && content?.contains(document.activeElement)) {
         // Move focus before applying inert. The section itself is outside the
         // hidden content and remains a stable, programmatically focused anchor.
-        if (!previousTabIndex.has(section)) previousTabIndex.set(section, section.getAttribute("tabindex"));
+        if (!previousTabIndex.has(section))
+          previousTabIndex.set(section, section.getAttribute("tabindex"));
         section.tabIndex = -1;
         section.focus({ preventScroll: true });
       }
       if (content) content.inert = !visible;
       section.dataset.arcContentVisible = value;
-      section.dispatchEvent(new Event("arlete:arc-content-visible", { bubbles: true }));
+      section.dispatchEvent(
+        new Event("arlete:arc-content-visible", { bubbles: true }),
+      );
     };
 
     const clear = (item: Scene, notify = true) => {
@@ -80,7 +99,7 @@ export function ArcScrollReveal() {
       item.contentProgress = progress;
       const last = Math.max(1, item.targets.length - 1);
       item.targets.forEach((element, index) => {
-        const start = 0.42 * index / last;
+        const start = (0.42 * index) / last;
         const local = Math.max(0, Math.min(1, (progress - start) / 0.58));
         const eased = 1 - (1 - local) ** 3;
         element.style.opacity = String(eased);
@@ -100,10 +119,16 @@ export function ArcScrollReveal() {
         // offsetTop is unaffected by the animated transform. Read only on resize/layout changes.
         const nextHeight = window.innerHeight;
         const nextWidth = document.documentElement.clientWidth;
-        if (height !== nextHeight || width !== nextWidth) geometry.forEach((item) => { item.q = -1; });
+        if (height !== nextHeight || width !== nextWidth)
+          geometry.forEach((item) => {
+            item.q = -1;
+          });
         height = nextHeight;
         width = nextWidth;
-        destinationOffset = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+        destinationOffset =
+          parseFloat(
+            getComputedStyle(document.documentElement).scrollPaddingTop,
+          ) || 0;
         // Native sticky owns the outgoing frame. JavaScript only measures its
         // height; it never compensates scroll by moving individual sections.
         const heights = outgoing.map((element) => element.offsetHeight);
@@ -123,7 +148,10 @@ export function ArcScrollReveal() {
         outgoing.forEach((element, index) => {
           const previous = stickySizes[index];
           if (previous.height !== heights[index]) {
-            element.style.setProperty("--arc-outgoing-height", `${heights[index]}px`);
+            element.style.setProperty(
+              "--arc-outgoing-height",
+              `${heights[index]}px`,
+            );
             previous.height = heights[index];
           }
           if (previous.viewport !== height) {
@@ -137,14 +165,22 @@ export function ArcScrollReveal() {
       if (previousHash !== location.hash) {
         previousHash = location.hash;
         try {
-          destination = document.getElementById(decodeURIComponent(previousHash.slice(1)))?.closest<HTMLElement>("[data-arc-scroll]") ?? null;
+          destination =
+            document
+              .getElementById(decodeURIComponent(previousHash.slice(1)))
+              ?.closest<HTMLElement>("[data-arc-scroll]") ?? null;
         } catch {
           destination = null;
         }
       }
       const scroll = window.scrollY;
       geometry.forEach((item) => {
-        const p = sceneProgress(item.top, scroll, height, item.section === destination ? destinationOffset : 0);
+        const p = sceneProgress(
+          item.top,
+          scroll,
+          height,
+          item.section === destination ? destinationOffset : 0,
+        );
         // Native sticky and the mask use the same instantaneous scroll sample.
         // No independent settling clock: jumps and reversals settle in this frame.
         // Keep the viewport surface until the section reaches its final position.
@@ -181,11 +217,15 @@ export function ArcScrollReveal() {
             item.path = path;
           }
           const hint = q > 0 && q < 1 ? "clip-path" : "auto";
-          if (item.surface.style.willChange !== hint) item.surface.style.willChange = hint;
+          if (item.surface.style.willChange !== hint)
+            item.surface.style.willChange = hint;
           item.q = q;
         }
         if (item.content) {
-          const entrance = Math.max(0, Math.min(1, (p - ARC_COVERED) / (1 - ARC_COVERED)));
+          const entrance = Math.max(
+            0,
+            Math.min(1, (p - ARC_COVERED) / (1 - ARC_COVERED)),
+          );
           renderContent(item, entrance);
           setContentVisible(item, entrance > 0);
         }
@@ -201,8 +241,10 @@ export function ArcScrollReveal() {
     };
     const observer = new ResizeObserver(measure);
     const visibility = () => {
-      if (document.hidden) { cancelAnimationFrame(frame); frame = 0; }
-      else measure();
+      if (document.hidden) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+      } else measure();
     };
     const main = document.querySelector("main");
     if (main) observer.observe(main);

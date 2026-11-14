@@ -12,18 +12,27 @@ export function CTAButtons() {
   }
   return (
     <div className={styles.contactActions} data-reveal="cta">
-      <Button render={<a
-        href={bookingHref}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={() => track("cta_whatsapp_click", "whatsapp_booking")}
-      />}>
+      <Button
+        render={
+          <a
+            href={bookingHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => track("cta_whatsapp_click", "whatsapp_booking")}
+          />
+        }
+      >
         Marcar no WhatsApp
       </Button>
-      <Button variant="secondary" render={<a
-        href={`tel:${site.phoneRaw}`}
-        onClick={() => track("cta_call_click", "phone_call")}
-      />}>
+      <Button
+        variant="secondary"
+        render={
+          <a
+            href={`tel:${site.phoneRaw}`}
+            onClick={() => track("cta_call_click", "phone_call")}
+          />
+        }
+      >
         Ligar
       </Button>
       <Button variant="secondary" render={<a href={`mailto:${site.email}`} />}>

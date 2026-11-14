@@ -101,9 +101,7 @@ function Card({ service }: { service: (typeof services)[number] }) {
           {service.title}
         </h3>
 
-        <p className="mt-2 text-sm text-[#2f2d2d]/80">
-          {service.desc}
-        </p>
+        <p className="mt-2 text-sm text-[#2f2d2d]/80">{service.desc}</p>
 
         <div className="mt-4 h-px w-0 bg-[#875f46] transition-all duration-500 group-hover:w-full" />
 

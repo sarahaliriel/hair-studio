@@ -59,14 +59,25 @@
   background: #482c30;
   overflow: hidden;
 }
-html.intro-pending, html.intro-pending body { background: var(--wine); }
-html.intro-pending main > :not(.home-intro) { visibility: hidden; }
+html.intro-pending,
+html.intro-pending body {
+  background: var(--wine);
+}
+html.intro-pending main > :not(.home-intro) {
+  visibility: hidden;
+}
 html.intro-pending .classic-header,
 html.intro-pending .site-header,
 html.intro-pending footer,
-html.intro-pending .skip-link { visibility: hidden; }
-html.intro-pending .home-intro { visibility: visible; pointer-events: auto; }
-.home-intro[data-active="true"], .home-intro[data-active="revealing"] {
+html.intro-pending .skip-link {
+  visibility: hidden;
+}
+html.intro-pending .home-intro {
+  visibility: visible;
+  pointer-events: auto;
+}
+.home-intro[data-active="true"],
+.home-intro[data-active="revealing"] {
   visibility: visible;
   pointer-events: auto;
 }
@@ -247,28 +258,48 @@ html.intro-pending .home-intro { visibility: visible; pointer-events: auto; }
   background: var(--arc-background, #ece4db);
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-arc-surface] { display: none !important; }
-  [data-arc-content] { opacity: 1 !important; transform: none !important; }
-  .arc-scroll-section[data-arc-active] { background: var(--arc-background, #ece4db); }
+  [data-arc-surface] {
+    display: none !important;
+  }
+  [data-arc-content] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .arc-scroll-section[data-arc-active] {
+    background: var(--arc-background, #ece4db);
+  }
 }
 
-[data-arc-content] { position: relative; z-index: 1; }
+[data-arc-content] {
+  position: relative;
+  z-index: 1;
+}
 
 /* Give inline labels a box for their local upward reveal. */
-[data-arc-content] .eyebrow { display: block; }
+[data-arc-content] .eyebrow {
+  display: block;
+}
 @media (prefers-reduced-motion: reduce) {
-  [data-arc-content] { visibility: visible !important; }
+  [data-arc-content] {
+    visibility: visible !important;
+  }
 }
 
 /* Freeze the whole outgoing composition in the browser's native scroll pipeline. */
-.arc-scroll-scene { position: relative; }
+.arc-scroll-scene {
+  position: relative;
+}
 .arc-scroll-outgoing {
   position: sticky;
-  top: calc(var(--arc-viewport-height, 100svh) - var(--arc-outgoing-height, 100000px));
+  top: calc(
+    var(--arc-viewport-height, 100svh) - var(--arc-outgoing-height, 100000px)
+  );
   z-index: 0;
 }
 @media (prefers-reduced-motion: reduce) {
-  .arc-scroll-outgoing { position: static; }
+  .arc-scroll-outgoing {
+    position: static;
+  }
 }
 
 /* Semantic tokens for components/ui. */
@@ -381,13 +412,17 @@ html.intro-pending .home-intro { visibility: visible; pointer-events: auto; }
   text-decoration: none;
   vertical-align: middle;
 }
-.site-button::before { display: none; }
+.site-button::before {
+  display: none;
+}
 .site-button-label,
 .site-button-arrow {
   background: var(--wine);
   color: var(--bg);
   border-radius: 999px;
-  transition: background-color 500ms ease-in-out, color 500ms ease-in-out;
+  transition:
+    background-color 500ms ease-in-out,
+    color 500ms ease-in-out;
 }
 .site-button-label {
   display: flex;
@@ -414,7 +449,9 @@ html.intro-pending .home-intro { visibility: visible; pointer-events: auto; }
   opacity: 1;
   transition: transform 500ms ease-in-out;
 }
-.site-button-arrow-in { transform: translateX(-40px); }
+.site-button-arrow-in {
+  transform: translateX(-40px);
+}
 .site-button:is(:hover, :focus-visible, :active) .site-button-label,
 .site-button:is(:hover, :focus-visible, :active) .site-button-arrow,
 .site-button[aria-pressed="true"] .site-button-label,
@@ -422,10 +459,18 @@ html.intro-pending .home-intro { visibility: visible; pointer-events: auto; }
   background: var(--clay);
   color: var(--bg);
 }
-.site-button:is(:hover, :focus-visible) .site-button-arrow-out { transform: translateX(40px); }
-.site-button:is(:hover, :focus-visible) .site-button-arrow-in { transform: translateX(0); }
+.site-button:is(:hover, :focus-visible) .site-button-arrow-out {
+  transform: translateX(40px);
+}
+.site-button:is(:hover, :focus-visible) .site-button-arrow-in {
+  transform: translateX(0);
+}
 @media (prefers-reduced-motion: reduce) {
-  .site-button-label, .site-button-arrow, .site-button-arrow svg { transition: none; }
+  .site-button-label,
+  .site-button-arrow,
+  .site-button-arrow svg {
+    transition: none;
+  }
 }
 
 /* Secondary: transparent pill with a sliding, duplicated label. */
@@ -434,22 +479,59 @@ html.intro-pending .home-intro { visibility: visible; pointer-events: auto; }
   background: transparent;
   color: var(--wine);
   padding: 11px 23px;
-  transition: border-color 500ms ease-in-out, color 500ms ease-in-out;
+  transition:
+    border-color 500ms ease-in-out,
+    color 500ms ease-in-out;
 }
-.site-button.site-button-secondary:is(:hover, :focus-visible, :active, [aria-pressed="true"]) {
+.site-button.site-button-secondary:is(
+    :hover,
+    :focus-visible,
+    :active,
+    [aria-pressed="true"]
+  ) {
   border-color: var(--clay);
   color: var(--clay);
   background: transparent;
 }
-.site-button.site-button-inverse[data-slot="button"] { color: var(--wine); }
-.site-button.site-button-inverse.site-button-static[data-slot="button"] { background: var(--nude); padding: 12px 24px; }
-.site-button.site-button-inverse.site-button-static:is(:hover, :focus-visible, :active) { background: var(--bg); }
+.site-button.site-button-inverse[data-slot="button"] {
+  color: var(--wine);
+}
+.site-button.site-button-inverse.site-button-static[data-slot="button"] {
+  background: var(--nude);
+  padding: 12px 24px;
+}
+.site-button.site-button-inverse.site-button-static:is(
+    :hover,
+    :focus-visible,
+    :active
+  ) {
+  background: var(--bg);
+}
 .site-button-inverse .site-button-label,
-.site-button-inverse .site-button-arrow.site-button-arrow { background: var(--nude); color: var(--wine); }
-.site-button-inverse:is(:hover, :focus-visible, :active, [aria-pressed="true"]) .site-button-label,
-.site-button-inverse:is(:hover, :focus-visible, :active, [aria-pressed="true"]) .site-button-arrow.site-button-arrow { background: var(--bg); color: var(--wine); }
-.site-button.site-button-inverse-outline[data-slot="button"] { color: var(--bg); border-color: #e1cfc399; }
-.site-button.site-button-inverse-outline:is(:hover, :focus-visible, :active, [aria-pressed="true"]) { color: var(--nude); border-color: var(--bg); }
+.site-button-inverse .site-button-arrow.site-button-arrow {
+  background: var(--nude);
+  color: var(--wine);
+}
+.site-button-inverse:is(:hover, :focus-visible, :active, [aria-pressed="true"])
+  .site-button-label,
+.site-button-inverse:is(:hover, :focus-visible, :active, [aria-pressed="true"])
+  .site-button-arrow.site-button-arrow {
+  background: var(--bg);
+  color: var(--wine);
+}
+.site-button.site-button-inverse-outline[data-slot="button"] {
+  color: var(--bg);
+  border-color: #e1cfc399;
+}
+.site-button.site-button-inverse-outline:is(
+    :hover,
+    :focus-visible,
+    :active,
+    [aria-pressed="true"]
+  ) {
+  color: var(--nude);
+  border-color: var(--bg);
+}
 .site-button-text-mask {
   display: grid;
   overflow: hidden;
@@ -458,9 +540,15 @@ html.intro-pending .home-intro { visibility: visible; pointer-events: auto; }
   grid-area: 1 / 1;
   transition: transform 500ms ease-in-out;
 }
-.site-button-text-in { transform: translateX(-110%); }
-.site-button-secondary:is(:hover, :focus-visible) .site-button-text-out { transform: translateX(110%); }
-.site-button-secondary:is(:hover, :focus-visible) .site-button-text-in { transform: translateX(0); }
+.site-button-text-in {
+  transform: translateX(-110%);
+}
+.site-button-secondary:is(:hover, :focus-visible) .site-button-text-out {
+  transform: translateX(110%);
+}
+.site-button-secondary:is(:hover, :focus-visible) .site-button-text-in {
+  transform: translateX(0);
+}
 
 /* Shared arrow-only surface and decorative card indicators. */
 .site-button.site-button-icon[data-slot="button"] {
@@ -489,18 +577,26 @@ button:is(:hover, :focus-visible) .site-button-arrow {
   color: var(--bg);
 }
 a:is(:hover, :focus-visible) .site-button-arrow-out,
-button:is(:hover, :focus-visible) .site-button-arrow-out { transform: translateX(40px); }
+button:is(:hover, :focus-visible) .site-button-arrow-out {
+  transform: translateX(40px);
+}
 a:is(:hover, :focus-visible) .site-button-arrow-in,
-button:is(:hover, :focus-visible) .site-button-arrow-in { transform: translateX(0); }
+button:is(:hover, :focus-visible) .site-button-arrow-in {
+  transform: translateX(0);
+}
 @media (prefers-reduced-motion: reduce) {
   .site-button.site-button-secondary,
-  .site-button-text-mask > span { transition: none; }
+  .site-button-text-mask > span {
+    transition: none;
+  }
 }
 
 /* Editorial hero and the cinematic entrance into O Espaço. */
 /* Keep the server-rendered first frame in its entrance state until GSAP starts. */
 @media (prefers-reduced-motion: reduce) {
-  .space-expansion-cta-arrow { transition: none; }
+  .space-expansion-cta-arrow {
+    transition: none;
+  }
 }
 
 /* Service cards: readable first on narrow screens, then progressively denser. */

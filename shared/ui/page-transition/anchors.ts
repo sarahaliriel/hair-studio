@@ -1,5 +1,8 @@
 /** Resolve a fragment without changing the URL or the current focus. */
-export function hashTarget(hash: string, doc: Pick<Document, "getElementById"> = document) {
+export function hashTarget(
+  hash: string,
+  doc: Pick<Document, "getElementById"> = document,
+) {
   if (!hash || hash === "#") return null;
   try {
     return doc.getElementById(decodeURIComponent(hash.slice(1)));

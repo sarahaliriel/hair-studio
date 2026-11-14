@@ -11,7 +11,9 @@ export function BookingLink({
   return (
     <Button
       className={className}
-      render={<a href={bookingHref} target="_blank" rel="noopener noreferrer" />}
+      render={
+        <a href={bookingHref} target="_blank" rel="noopener noreferrer" />
+      }
     >
       {children}
     </Button>

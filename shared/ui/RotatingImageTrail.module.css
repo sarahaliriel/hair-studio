@@ -17,5 +17,7 @@
   box-shadow: 0 8px 24px rgb(45 29 25 / 14%);
 }
 @media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
-  .layer { display: none; }
+  .layer {
+    display: none;
+  }
 }

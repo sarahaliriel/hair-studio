@@ -46,8 +46,7 @@ export default function CustomCursor() {
       const el = cursorRef.current;
       if (!el) return;
 
-      el.style.transform =
-        `translate3d(${x.current}px, ${y.current}px, 0) translate(-50%, -50%)`;
+      el.style.transform = `translate3d(${x.current}px, ${y.current}px, 0) translate(-50%, -50%)`;
     };
 
     const move = (e: PointerEvent) => {
