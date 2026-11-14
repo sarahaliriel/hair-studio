@@ -1,29 +1,36 @@
+import type { Metadata } from "next";
 import { SectionTitle } from "@/shared/ui/SectionTitleMenu";
 import { GalleryGrid } from "@/features/gallery/components/GalleryGrid";
 import { CTAButtons } from "@/shared/ui/CTAButtons";
 
+export const metadata: Metadata = {
+  title: "Galeria | Arlete Space",
+  description:
+    "Descobre os trabalhos de cabelo e artesanato da Arlete em Lisboa.",
+  alternates: { canonical: "/galeria" },
+};
+
 export default function GaleriaPage() {
   return (
-    <main className="bg-[#edeae2] text-[#2f2d2d] overflow-x-hidden">
-      <section className="mx-auto max-w-6xl px-4 pt-24 pb-6">
+    <div className="overflow-x-hidden bg-[var(--color-surface-alt)]">
+      <section className="mx-auto max-w-6xl px-4 pt-32 pb-10 sm:pt-36">
         <SectionTitle
-          overline="Galeria"
+          as="h1"
           title="Transformações reais"
-          desc="Alguns dos meus trabalhos em tranças, coloração, cortes e penteados. Cada look é feito à medida de cada pessoa."
+          desc="Tranças, coloração, cortes e penteados — e uma seleção de trabalhos artesanais da Arlete."
         />
       </section>
-<section id="galeria" className="px-4 pb-8">
-  <div className="mx-auto w-full max-w-6xl">
-    <GalleryGrid />
-  </div>
-</section>
+      <section id="galeria" className="px-4 pb-8">
+        <div className="container-content">
+          <GalleryGrid />
+        </div>
+      </section>
 
       <section className="px-4 pb-16">
         <div className="mx-auto w-full max-w-5xl">
-          <div className="soft-card overflow-hidden border border-[#2f2d2d]/10 bg-white/40">
-            <div className="p-6 sm:p-10">
+          <div className="soft-card overflow-hidden border border-[#2f2d2d]/10 bg-white/40" data-reveal="fadeUp" data-reveal-exit="none">
+            <div className="p-7 sm:p-10">
               <SectionTitle
-                overline="Marcação"
                 title="Gostou do que viu?"
                 desc="Vamos marcar! Diz-me o serviço, o dia e se preferes salão ou domicílio. Eu respondo o mais rápido possível."
               />
@@ -35,6 +42,6 @@ export default function GaleriaPage() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

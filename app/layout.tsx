@@ -1,37 +1,44 @@
-// @ts-ignore
 import "./globals.css";
+import { Reveal } from "@/shared/ui/Reveal";
 import type { Metadata, Viewport } from "next";
 import { Navbar } from "@/shared/ui/Navbar";
 import { Footer } from "@/shared/ui/Footer";
 import { FloatingCTA } from "@/shared/ui/FloatingCta";
-import { Cormorant_Garamond, Inter } from "next/font/google";
-import CustomCursor from "@/shared/ui/Cursor";
+import localFont from "next/font/local";
+import { PageTransitionProvider } from "@/shared/ui/PageTransition";
 
-const serif = Cormorant_Garamond({
-  subsets: ["latin"],
+const serif = localFont({
+  src: [
+    { path: "./fonts/serif-normal-400.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/serif-italic-400.woff2", weight: "400", style: "italic" },
+  ],
   variable: "--font-serif",
-  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
-
-const sans = Inter({
-  subsets: ["latin"],
+const sans = localFont({
+  src: [
+    {
+      path: "./fonts/inter-latin-variable.woff2",
+      weight: "100 900",
+      style: "normal",
+    },
+  ],
   variable: "--font-sans",
-  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
-const metadataBaseUrl =
-  process.env.NEXT_PUBLIC_SITE_URL?.startsWith("http")
-    ? process.env.NEXT_PUBLIC_SITE_URL
-    : "https://arlete.space";
+const metadataBaseUrl = process.env.NEXT_PUBLIC_SITE_URL?.startsWith("http")
+  ? process.env.NEXT_PUBLIC_SITE_URL
+  : "https://arlete.space";
 
 export const viewport: Viewport = {
-  themeColor: "#edeae2",
+  themeColor: "#f5f1eb",
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(metadataBaseUrl),
 
-  title: "Arlete Cabeleireira | Cabelos e Beleza em Lisboa",
+  title: "Arlete Space | Cabelos e Beleza em Lisboa",
   description:
     "Cabeleireira em Campo de Ourique, Lisboa. Especialista em tranças, penteados, coloração, corte unissexo, progressiva e hidratação. Marca já o teu atendimento.",
 
@@ -45,9 +52,9 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
+        url: "/images/heroopage.png",
+        width: 1920,
+        height: 1080,
       },
     ],
   },
@@ -70,8 +77,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-PT" className={`${serif.variable} ${sans.variable}`}>
+    <html lang="pt-PT" className={`${serif.variable} ${sans.variable}`} suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: `try{if(location.pathname==='/'&&!sessionStorage.getItem('arlete:home-intro:v1')&&!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('intro-pending')}catch{}` }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -80,7 +88,7 @@ export default function RootLayout({
               "@type": "HairSalon",
               name: "Arlete Cabeleireira",
               url: "https://arlete.space",
-              image: "https://arlete.space/og-image.jpg",
+              image: "https://arlete.space/images/heroopage.png",
               address: {
                 "@type": "PostalAddress",
                 addressLocality: "Lisboa",
@@ -95,12 +103,17 @@ export default function RootLayout({
         />
       </head>
 
-      <body className="min-h-dvh bg-[#edeae2] text-[#2f2d2d] antialiased">
-        <CustomCursor />
-        <Navbar />
-        <main>{children}</main>
-        <FloatingCTA />
-        <Footer />
+      <body className="min-h-dvh antialiased">
+        <PageTransitionProvider>
+          <a href="#main-content" className="skip-link">
+            Saltar para o conteúdo
+          </a>
+          <Navbar />
+          <main id="main-content">{children}</main>
+          <FloatingCTA />
+          <Footer />
+          <Reveal />
+        </PageTransitionProvider>
       </body>
     </html>
   );

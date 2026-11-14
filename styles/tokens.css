@@ -1,0 +1,33 @@
+:root {
+  --bg: #f5f1eb;
+  --ink: #241d1c;
+  --nude: #e1cfc3;
+  --clay: #8d6257;
+  --wine: #482c30;
+  --line: rgba(72, 44, 48, 0.2);
+  --radius-xl: 20px;
+  --shadow-soft: 0 14px 45px #241d1c0a;
+  /* Foundations: semantic aliases for values already used by the site. */
+  --color-surface-alt: #ece4db;
+  --color-text-secondary: #66534d;
+  --font-display: var(--font-serif), Georgia, serif;
+  --font-body: var(--font-sans), Arial, sans-serif;
+  /* Typography roles use the current editorial measurements. */
+  --type-section-size: clamp(34px, 4vw, 56px);
+  --type-page-size: clamp(52px, 7vw, 92px);
+  --type-card-size: 28px;
+  --type-eyebrow-size: 13px;
+  --type-body-size: 18px;
+  --type-button-size: 16px;
+  --space-section: 100px;
+  --space-section-compact: 65px;
+  --page-gutter: 6%;
+  --container-wide: 1600px;
+  --container-content: 72rem;
+  --heading-gap: 30px;
+  --card-gap: 30px;
+  --image-ratio-portrait: 3 / 4;
+  --radius-pill: 999px;
+  --focus-color: var(--wine);
+  --focus-width: 2px;
+}

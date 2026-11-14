@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 export default function ScrollIndicator() {
   useEffect(() => {
-    let timeout: any;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
 
     const activateScroll = () => {
       document.documentElement.classList.add("is-scrolling");

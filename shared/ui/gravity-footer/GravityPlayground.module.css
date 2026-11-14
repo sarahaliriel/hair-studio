@@ -1,0 +1,46 @@
+.playgroundWrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  isolation: isolate;
+}
+.stage {
+  position: absolute;
+  inset: 0;
+  bottom: 76px;
+  overflow: hidden;
+  contain: layout paint;
+  isolation: isolate;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.stage[data-mode="physics"] { cursor: grab; }
+.stage[data-dragging="true"] { cursor: grabbing; }
+.tool {
+  position: absolute;
+  width: min(var(--tool-width), 22vw);
+  height: auto;
+  left: clamp(8%, var(--tool-x), 88%);
+  bottom: 24px;
+  object-fit: contain;
+  transform: translateX(-50%) rotate(var(--tool-angle));
+  pointer-events: none;
+  filter: drop-shadow(0 9px 7px #482c301c);
+}
+.stage[data-mode="physics"] .tool {
+  top: 0;
+  left: 0;
+  bottom: auto;
+  max-width: none;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+.stage[data-state="sleeping"] .tool,
+.stage[data-state="paused"] .tool { will-change: auto; }
+@media (max-width: 600px) {
+  .tool { width: min(var(--tool-width), 27vw); }
+}
+@media (max-width: 760px) {
+  .stage { bottom: 144px; }
+}

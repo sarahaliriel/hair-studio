@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 
 type Brand = {
   name: string;
@@ -17,29 +18,57 @@ const brands: Brand[] = [
 ];
 
 export function BrandsMarquee() {
-  const loop = [...brands, ...brands];
-
+  const sectionRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const section = sectionRef.current;
+    const track = section?.querySelector<HTMLElement>(".marquee-track");
+    if (!section || !track) return;
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+    let visible = false;
+    const update = () => {
+      const running = String(visible && !document.hidden && !reduced.matches);
+      if (track.dataset.running !== running) track.dataset.running = running;
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      update();
+    });
+    observer.observe(section);
+    document.addEventListener("visibilitychange", update);
+    reduced.addEventListener("change", update);
+    update();
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", update);
+      reduced.removeEventListener("change", update);
+      delete track.dataset.running;
+    };
+  }, []);
   return (
-    <section className="py-6 overflow-hidden">
-      <div className="relative border-y border-[#2f2d2d]/10 py-6">
-
-        {/* fade lateral premium */}
-        <div className="pointer-events-none absolute left-0 top-0 h-full w-16 bg-linear-to-r from-[#edeae2] to-transparent z-10" />
-        <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-linear-to-l from-[#edeae2] to-transparent z-10" />
-
-        <div className="marquee-track flex w-max items-center gap-12 px-4">
-          {loop.map((b, idx) => (
+    <section ref={sectionRef} className="py-6 overflow-hidden">
+      <div className="border-y border-[#2f2d2d]/10 py-5">
+        <div className="marquee-track flex w-max items-center">
+          {[0, 1].map((copy) => (
             <div
-              key={`${b.name}-${idx}`}
-              className="group relative h-10 w-36 sm:h-12 sm:w-40 shrink-0 flex items-center justify-center opacity-80 transition-opacity duration-300 hover:opacity-100"
-              title={b.name}
+              key={copy}
+              className="flex shrink-0 items-center gap-8 pr-8 sm:gap-12 sm:pr-12"
+              aria-hidden={copy === 1 ? true : undefined}
             >
-              <Image
-                src={b.logo}
-                alt={b.name}
-                fill
-                className="object-contain scale-90 transition-transform duration-300 group-hover:scale-100"
-              />
+              {brands.map((brand) => (
+                <div
+                  key={brand.name}
+                  className="relative flex h-12 w-28 shrink-0 items-center justify-center sm:h-14 sm:w-32"
+                  title={brand.name}
+                >
+                  <Image
+                    src={brand.logo}
+                    alt={copy === 0 ? brand.name : ""}
+                    fill
+                    sizes="(max-width: 640px) 112px, 128px"
+                    style={{ objectFit: "contain", padding: "6px" }}
+                  />
+                </div>
+              ))}
             </div>
           ))}
         </div>
@@ -48,6 +77,11 @@ export function BrandsMarquee() {
       <style jsx>{`
         .marquee-track {
           animation: scroll 28s linear infinite;
+          animation-play-state: paused;
+        }
+
+        .marquee-track[data-running="true"] {
+          animation-play-state: running;
         }
 
         .marquee-track:hover {
@@ -63,9 +97,15 @@ export function BrandsMarquee() {
           }
         }
 
+        @media (prefers-reduced-motion: reduce) {
+          .marquee-track {
+            animation: none;
+          }
+        }
+
         @media (max-width: 640px) {
           .marquee-track {
-            animation: scroll 18s linear infinite;
+            animation-duration: 18s;
           }
         }
       `}</style>

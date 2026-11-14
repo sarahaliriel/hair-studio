@@ -1,4 +1,5 @@
 "use client";
+import { ArrowCircle } from "@/components/ui/button";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -77,7 +78,7 @@ export default function ServicesPreview() {
   );
 }
 
-function Card({ service }: any) {
+function Card({ service }: { service: (typeof services)[number] }) {
   return (
     <div className="group relative overflow-hidden rounded-4xl border border-[#2f2d2d]/10 bg-white/40 backdrop-blur-xl">
       <div className="relative h-56 w-full overflow-hidden">
@@ -111,9 +112,7 @@ function Card({ service }: any) {
           className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#5b5545]"
         >
           Ver detalhes
-          <span className="transition-transform duration-300 group-hover:translate-x-1">
-            →
-          </span>
+          <ArrowCircle />
         </Link>
       </div>
 

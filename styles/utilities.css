@@ -1,0 +1,14 @@
+.section-wrap {
+  padding: var(--space-section) var(--page-gutter);
+  max-width: var(--container-wide);
+  margin: auto;
+}
+.container-content {
+  width: 100%;
+  max-width: var(--container-content);
+  margin-inline: auto;
+}
+
+.soft-card {
+  border-radius: var(--radius-xl);
+}
