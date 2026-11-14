@@ -5,6 +5,7 @@ import { useGSAP } from "@gsap/react";
 import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useRef, type ReactNode } from "react";
 import { destinationTitle, routeKey } from "./page-transition/routes";
+import { alignHash, hashTarget } from "./page-transition/anchors";
 import { TransitionOverlay, hiddenPath } from "./page-transition/TransitionOverlay";
 
 gsap.registerPlugin(useGSAP);
@@ -58,6 +59,30 @@ export function PageTransitionProvider({ children }: { children: ReactNode }) {
       previousInert: boolean;
       previousBusy: string | null;
     } | null = null;
+    // Only the initial fragment covered by HomeIntro needs a post-intro alignment.
+    const intro = document.querySelector<HTMLElement>("[data-home-intro]");
+    let pendingInitialHash = location.hash &&
+      (document.documentElement.classList.contains("intro-pending") ||
+        intro?.dataset.active === "true" || intro?.dataset.active === "revealing")
+      ? { path: location.pathname, search: location.search, hash: location.hash }
+      : null;
+
+    const alignAfterIntro = () => {
+      if (!pendingInitialHash) return;
+      if (location.pathname !== pendingInitialHash.path ||
+          location.search !== pendingInitialHash.search ||
+          location.hash !== pendingInitialHash.hash) {
+        pendingInitialHash = null;
+        return;
+      }
+      if (document.documentElement.classList.contains("intro-pending") ||
+          intro?.dataset.active !== "false" ||
+          document.body.style.overflow === "hidden" || main.inert ||
+          layer.dataset.active === "true") return;
+      const hash = pendingInitialHash.hash;
+      pendingInitialHash = null;
+      alignHash(hash);
+    };
 
     function release(focus = false) {
       if (!active) return;
@@ -87,9 +112,7 @@ export function PageTransitionProvider({ children }: { children: ReactNode }) {
       if (!current || current.preparing || !current.committed) return;
       current.preparing = true;
       const alignDestination = () => {
-        const target = current.url.hash && document.getElementById(decodeURIComponent(current.url.hash.slice(1)));
-        if (target) target.scrollIntoView({ behavior: "instant", block: "start" });
-        else window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        if (!alignHash(current.url.hash)) window.scrollTo({ top: 0, left: 0, behavior: "instant" });
       };
       alignDestination();
       await prepareDestination(current.controller.signal);
@@ -188,11 +211,20 @@ export function PageTransitionProvider({ children }: { children: ReactNode }) {
       const url = new URL(anchor.href, location.href);
       if (url.origin !== location.origin || !["http:", "https:"].includes(url.protocol)) return;
       if (active) { event.preventDefault(); return; }
+      if (routeKey(url.pathname) === routeKey(location.pathname) &&
+          url.search === location.search && url.hash && !media.matches &&
+          hashTarget(url.hash)?.closest("[data-arc-scroll]")) {
+        event.preventDefault();
+        pendingInitialHash = null;
+        if (url.href !== location.href) router.push(`${url.pathname}${url.search}${url.hash}`, { scroll: false });
+        alignHash(url.hash);
+        return;
+      }
       if (routeKey(url.pathname) === routeKey(location.pathname) || media.matches) return;
       event.preventDefault();
       start(url.href);
     };
-    const cancel = () => release();
+    const cancel = () => { pendingInitialHash = null; release(); };
     const motionChange = () => {
       if (!media.matches || !active) return;
       const url = active.url;
@@ -200,11 +232,13 @@ export function PageTransitionProvider({ children }: { children: ReactNode }) {
       router.push(`${url.pathname}${url.search}${url.hash}`);
     };
     document.addEventListener("click", click, true);
+    document.addEventListener("arlete:page-visible", alignAfterIntro);
     window.addEventListener("popstate", cancel);
     window.addEventListener("pagehide", cancel);
     media.addEventListener("change", motionChange);
     return () => {
       document.removeEventListener("click", click, true);
+      document.removeEventListener("arlete:page-visible", alignAfterIntro);
       window.removeEventListener("popstate", cancel);
       window.removeEventListener("pagehide", cancel);
       media.removeEventListener("change", motionChange);

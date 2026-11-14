@@ -6,6 +6,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Button } from "@/components/ui/button";
+import styles from "./ExpandingSpaceSection.module.css";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -46,31 +47,31 @@ export function ExpandingSpaceSection() {
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} id="sobre" className="space-expansion" data-reveal="none" aria-label="O espaço">
-      <div className="space-expansion-stage">
-        <div className="space-expansion-frame" data-space-frame>
+    <section ref={sectionRef} id="sobre" className={styles.spaceExpansion} data-reveal="none" aria-label="O espaço">
+      <div className={styles.spaceExpansionStage}>
+        <div className={styles.spaceExpansionFrame} data-space-frame>
           <Image src="/images/editorial/coloracao-liso.webp" alt="Modelo de costas com cabelo liso castanho iluminado" fill sizes="100vw" />
-          <div className="space-expansion-shade" data-space-shade aria-hidden="true" />
-          <div className="space-expansion-content" data-space-content>
-            <div className="space-expansion-bottom">
-              <div className="space-expansion-copy">
+          <div className={styles.spaceExpansionShade} data-space-shade aria-hidden="true" />
+          <div className={styles.spaceExpansionContent} data-space-content>
+            <div className={styles.spaceExpansionBottom}>
+              <div className={styles.spaceExpansionCopy}>
                 <h2 data-space-reveal>Cuidado pensado para ti.</h2>
                 <p data-space-reveal>Cada atendimento é pessoal, calmo e feito com atenção ao teu estilo.</p>
               </div>
-              <div className="space-expansion-thumbnails" aria-label="Explora os serviços">
+              <div className={styles.spaceExpansionThumbnails} aria-label="Explora os serviços">
                 {[
                   { src: "/images/gallery/02.png", label: "Tranças", category: "penteados", position: "center 38%" },
                   { src: "/images/gallery/16.png", label: "Penteados", category: "penteados", position: "center 32%" },
                   { src: "/images/gallery/003.png", label: "Ondas", category: "cabelo", position: "center 42%" },
                 ].map((item) => (
-                  <a key={item.label} href={`/servicos?categoria=${item.category}#servicos-list`} className="space-expansion-thumbnail" data-space-reveal aria-label={`Ver serviços de ${item.label.toLowerCase()}`}>
+                  <a key={item.label} href={`/servicos?categoria=${item.category}#servicos-list`} className={styles.spaceExpansionThumbnail} data-space-reveal aria-label={`Ver serviços de ${item.label.toLowerCase()}`}>
                     <Image src={item.src} alt={item.label} fill sizes="(max-width: 700px) 28vw, 150px" style={{ objectPosition: item.position }} />
                     <span>{item.label}</span>
-                    <span className="space-expansion-thumbnail-arrow" aria-hidden="true">↗</span>
+                    <span className={styles.spaceExpansionThumbnailArrow} aria-hidden="true">↗</span>
                   </a>
                 ))}
               </div>
-              <div className="space-expansion-action" data-space-reveal>
+              <div className={styles.spaceExpansionAction} data-space-reveal>
                 <Button variant="inverse" render={<a href="#contato" />}>Vamos conversar</Button>
               </div>
             </div>

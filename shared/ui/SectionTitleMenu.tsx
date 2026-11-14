@@ -1,3 +1,5 @@
+import styles from "./SectionTitleMenu.module.css";
+
 export function SectionTitle({
   overline,
   title,
@@ -22,7 +24,7 @@ export function SectionTitle({
       <Heading
         className={
           Heading === "h1"
-            ? "page-heading"
+            ? styles.pageHeading
             : "font-serif !mt-5 !mb-0 !text-[clamp(36px,4.5vw,64px)] !leading-[1.12] tracking-[-0.02em] text-[#2f2d2d]"
         }
       >

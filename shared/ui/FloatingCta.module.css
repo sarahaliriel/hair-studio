@@ -1,0 +1,23 @@
+.floatingCta {
+  display: none;
+}
+.floatingCta[data-visible="false"] {
+  visibility: hidden;
+  pointer-events: none;
+}
+@media (max-width: 760px) {
+  .floatingCta {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 5% calc(10px + env(safe-area-inset-bottom));
+    background: #f5f1ebee;
+    backdrop-filter: blur(12px);
+    z-index: 45;
+    border-top: 1px solid var(--line);
+  }
+}
+.floatingCta :global(.site-button) { width: 100%; }
+.floatingCta :global(.site-button-label) { flex: 1; }

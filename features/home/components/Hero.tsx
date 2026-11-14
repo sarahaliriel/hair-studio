@@ -10,6 +10,7 @@ import { heroTrailImages } from "@/features/gallery/data/images";
 import { BookingLink } from "@/shared/ui/BookingLink";
 import { RotatingImageTrail } from "@/shared/ui/RotatingImageTrail";
 import { whenPageVisible } from "@/shared/ui/page-transition/readiness";
+import styles from "./Hero.module.css";
 
 gsap.registerPlugin(useGSAP);
 
@@ -51,18 +52,18 @@ export function Hero() {
   }, { scope: stageRef });
 
   return (
-    <section className="gallery-hero" aria-labelledby="hero-title">
-      <div ref={stageRef} className="gallery-hero-stage" data-reveal="none">
+    <section className={styles.galleryHero} aria-labelledby="hero-title">
+      <div ref={stageRef} className={styles.galleryHeroStage} data-reveal="none">
         <RotatingImageTrail images={heroTrailImages} />
-        <div className="gallery-hero-content">
-          <p className="gallery-hero-description hero-description-corner" data-hero-support>Mais do que um novo look, um momento só teu. Tranças, cortes, coloração e penteados feitos com cuidado, criatividade e atenção a cada detalhe.</p>
-          <h1 id="hero-title" className="editorial-hero-title" aria-label="Tranças, cortes e cor a sua maneira.">
-            <span className="hero-line-mask hero-line-mask-first" aria-hidden="true"><span className="hero-line hero-line-one" data-hero-line>Tranças,</span></span>
-            <span className="hero-line-mask" aria-hidden="true"><span className="hero-line hero-line-two" data-hero-line><span className="hero-capsule" data-hero-capsule><Image src="/images/editorial/trancas-delicadas.webp" alt="Penteado semi-preso com tranças delicadas e ondas longas" fill sizes="(max-width: 700px) 20vw, 220px" priority /></span>cortes e cor</span></span>
-            <span className="hero-line-mask" aria-hidden="true"><span className="hero-line hero-line-three" data-hero-line><em>a sua maneira.</em></span></span>
+        <div className={`gallery-hero-content ${styles.galleryHeroContent}`}>
+          <p className={`${styles.galleryHeroDescription} ${styles.heroDescriptionCorner}`} data-hero-support>Mais do que um novo look, um momento só teu. Tranças, cortes, coloração e penteados feitos com cuidado, criatividade e atenção a cada detalhe.</p>
+          <h1 id="hero-title" className={styles.editorialHeroTitle} aria-label="Tranças, cortes e cor a sua maneira.">
+            <span className={`${styles.heroLineMask} ${styles.heroLineMaskFirst}`} aria-hidden="true"><span className={`${styles.heroLine} ${styles.heroLineOne}`} data-hero-line>Tranças,</span></span>
+            <span className={styles.heroLineMask} aria-hidden="true"><span className={`${styles.heroLine} ${styles.heroLineTwo}`} data-hero-line><span className={styles.heroCapsule} data-hero-capsule><Image src="/images/editorial/trancas-delicadas.webp" alt="Penteado semi-preso com tranças delicadas e ondas longas" fill sizes="(max-width: 700px) 20vw, 220px" priority /></span>cortes e cor</span></span>
+            <span className={styles.heroLineMask} aria-hidden="true"><span className={`${styles.heroLine} ${styles.heroLineThree}`} data-hero-line><em>a sua maneira.</em></span></span>
           </h1>
-          <div className="hero-copy" data-hero-support>
-            <div className="gallery-hero-actions">
+          <div className={`hero-copy ${styles.heroCopy}`} data-hero-support>
+            <div className={`gallery-hero-actions ${styles.galleryHeroActions}`}>
               <BookingLink>Marcar horário</BookingLink>
               <Button variant="secondary" render={<Link href="/servicos" />}>Ver serviços</Button>
             </div>

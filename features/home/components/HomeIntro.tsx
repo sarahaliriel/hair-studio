@@ -3,12 +3,14 @@
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useRef } from "react";
+import styles from "./HomeIntro.module.css";
 
 gsap.registerPlugin(useGSAP);
 
 const KEY = "arlete:home-intro:v1";
 const photos = ["02", "003", "004", "007", "11"];
 const rotations = [-5, 4, -3, 5, -7];
+const cardStyles = [styles.card1, styles.card2, styles.card3, styles.card4, styles.card5];
 
 export function HomeIntro() {
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -27,7 +29,7 @@ export function HomeIntro() {
     const cards = Array.from(overlay.querySelectorAll<HTMLElement>("[data-intro-card]"));
     const previousOverflow = document.body.style.overflow;
     // The intro lives inside main, so lock the other top-level controls separately.
-    const controls = Array.from(document.querySelectorAll<HTMLElement>("main, .classic-header, .site-header, .floating-cta, footer, .skip-link"));
+    const controls = Array.from(document.querySelectorAll<HTMLElement>("main, .classic-header, .site-header, footer, .skip-link"));
     const previousInert = controls.map((node) => [node, node.inert] as const);
     let finished = false;
     let started = false;
@@ -117,9 +119,9 @@ export function HomeIntro() {
 
   return (
     <div ref={overlayRef} className="home-intro" data-home-intro data-active="false" aria-hidden="true">
-      <div className="home-intro-composition">
+      <div className={styles.composition}>
         {photos.map((name, index) => (
-          <div className={`home-intro-card home-intro-card-${index + 1}`} data-intro-card key={name}>
+          <div className={`home-intro-card home-intro-card-${index + 1} ${styles.card} ${cardStyles[index]}`} data-intro-card key={name}>
             {/* Dedicated small assets are requested only when the intro actually runs. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img data-src={`/images/intro/${name}.webp`} alt="" draggable={false} />

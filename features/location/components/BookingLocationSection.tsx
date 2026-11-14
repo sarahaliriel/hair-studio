@@ -10,9 +10,6 @@ function waLink() {
   return `https://wa.me/${site.whatsappRaw}?text=${text}`;
 }
 
-const mapsUrl =
-  "https://www.google.com/maps/search/?api=1&query=R.%20Silva%20Carvalho%2054B%2C%201250-255%20Lisboa";
-
 export function BookingLocationSection() {
   return (
     <section id="contato" className="px-4 py-12 pb-16">

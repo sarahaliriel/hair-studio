@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRef } from "react";
 import { bookingHref } from "./BookingLink";
 import { site } from "@/config/Site";
+import styles from "./Navbar.module.css";
 
 const left = [
   { href: "/", label: "Início" },
@@ -19,9 +20,9 @@ const right = [
 export function Navbar() {
   const menu = useRef<HTMLDetailsElement>(null);
   return (
-    <header className="classic-header">
-      <div className="classic-navbar">
-        <nav className="classic-nav-left" aria-label="Navegação principal">
+    <header className={`classic-header ${styles.classicHeader}`}>
+      <div className={`classic-navbar ${styles.classicNavbar}`}>
+        <nav className={`classic-nav-left ${styles.classicNavLeft}`} aria-label="Navegação principal">
           {left.map((item) => (
             <Link href={item.href} key={item.href}>
               {item.label}
@@ -30,7 +31,7 @@ export function Navbar() {
         </nav>
         <Link
           href="/"
-          className="classic-logo"
+          className={`classic-logo ${styles.classicLogo}`}
           aria-label="Arlete Space — início"
         >
           <Image
@@ -41,7 +42,7 @@ export function Navbar() {
             priority
           />
         </Link>
-        <div className="classic-nav-right">
+        <div className={`classic-nav-right ${styles.classicNavRight}`}>
           <nav aria-label="Galeria e contacto">
             {right.map((item) => (
               <Link href={item.href} key={item.href}>
@@ -49,7 +50,7 @@ export function Navbar() {
               </Link>
             ))}
           </nav>
-          <Button className="navbar-booking" render={<a
+          <Button className={`navbar-booking ${styles.navbarBooking}`} render={<a
             href={bookingHref}
             target="_blank"
             rel="noopener noreferrer"
@@ -58,7 +59,7 @@ export function Navbar() {
           </Button>
         </div>
         <details
-          className="classic-mobile-menu"
+          className={`classic-mobile-menu ${styles.classicMobileMenu}`}
           ref={menu}
           onKeyDown={(event) => {
             if (event.key === "Escape" && menu.current) {

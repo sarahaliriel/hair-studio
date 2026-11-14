@@ -78,7 +78,7 @@ export default function ServicesPreview() {
   );
 }
 
-function Card({ service }: any) {
+function Card({ service }: { service: (typeof services)[number] }) {
   return (
     <div className="group relative overflow-hidden rounded-4xl border border-[#2f2d2d]/10 bg-white/40 backdrop-blur-xl">
       <div className="relative h-56 w-full overflow-hidden">

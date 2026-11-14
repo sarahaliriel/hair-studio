@@ -1,0 +1,4 @@
+.serviceSearch:focus-within {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: 2px;
+}

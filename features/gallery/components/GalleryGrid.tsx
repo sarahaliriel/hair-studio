@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { galleryImages as ITEMS } from "@/features/gallery/data/images";
+import styles from "./GalleryGrid.module.css";
 
 export function GalleryGrid() {
   const [active, setActive] = useState<number | null>(null);
@@ -119,11 +120,11 @@ export function GalleryGrid() {
   const number = (value: number) => String(value).padStart(2, "0");
   return (
     <>
-      <div ref={grid} className="gallery-grid" data-reveal="none">
+      <div ref={grid} className={styles.galleryGrid} data-reveal="none">
         {ITEMS.map((item, index) => (
           <Button
             key={item.id}
-            className="gallery-tile"
+            className={`gallery-tile ${styles.galleryTile}`}
             animated={false}
             variant="ghost"
             aria-label={`Ver: ${item.alt}`}
@@ -141,7 +142,7 @@ export function GalleryGrid() {
       </div>
       <dialog
         ref={dialog}
-        className="gallery-dialog"
+        className={styles.galleryDialog}
         aria-label="Visualização da galeria"
         onClose={close}
         onCancel={(event) => { event.preventDefault(); close(); }}
@@ -155,19 +156,19 @@ export function GalleryGrid() {
       >
         {current && (
           <>
-            <header className="gallery-dialog-header">
-              <div className="gallery-dialog-context">
+            <header className={styles.galleryDialogHeader}>
+              <div className={styles.galleryDialogContext}>
                 <span>GALERIA</span>
-                {current.category && <><span className="gallery-dialog-divider" aria-hidden="true" /><span>{current.category}</span></>}
+                {current.category && <><span className={styles.galleryDialogDivider} aria-hidden="true" /><span>{current.category}</span></>}
               </div>
-              <Button className="gallery-close" size="icon" animated={false} aria-label="Fechar galeria" onClick={close}>
+              <Button className={styles.galleryClose} size="icon" animated={false} aria-label="Fechar galeria" onClick={close}>
                 <X aria-hidden="true" />
               </Button>
             </header>
-            <div className="gallery-viewer">
-              <Button className="gallery-prev" variant="arrow" direction="left" aria-label="Fotografia anterior" onClick={() => move(-1)} />
+            <div className={styles.galleryViewer}>
+              <Button className={styles.galleryPrev} variant="arrow" direction="left" aria-label="Fotografia anterior" onClick={() => move(-1)} />
               <div
-                className="gallery-photo"
+                className={styles.galleryPhoto}
                 aria-live="polite"
                 aria-atomic="true"
                 onTouchStart={(event) => { touchStart.current = event.touches[0].clientX; }}
@@ -179,31 +180,31 @@ export function GalleryGrid() {
                 }}
               >
                 {outgoing !== null && (
-                  <div className="gallery-photo-layer gallery-photo-outgoing" aria-hidden="true">
+                  <div className={`${styles.galleryPhotoLayer} ${styles.galleryPhotoOutgoing}`} aria-hidden="true">
                     <Image src={ITEMS[outgoing].src} alt="" fill sizes="(max-width: 640px) 100vw, 80vw" />
                   </div>
                 )}
-                <div className="gallery-photo-layer gallery-photo-current" key={current.id}>
+                <div className={`${styles.galleryPhotoLayer} ${styles.galleryPhotoCurrent}`} key={current.id}>
                   <Image src={current.src} alt={current.alt} fill sizes="(max-width: 640px) 100vw, 80vw" />
                 </div>
               </div>
-              <Button className="gallery-next" variant="arrow" direction="right" aria-label="Fotografia seguinte" onClick={() => move(1)} />
+              <Button className={styles.galleryNext} variant="arrow" direction="right" aria-label="Fotografia seguinte" onClick={() => move(1)} />
             </div>
-            <div className="gallery-dialog-caption">
+            <div className={styles.galleryDialogCaption}>
               <div>
-                <p className="gallery-caption-title">{current.alt}</p>
-                {current.category && <p className="gallery-caption-category">{current.category}</p>}
+                <p className={styles.galleryCaptionTitle}>{current.alt}</p>
+                {current.category && <p className={styles.galleryCaptionCategory}>{current.category}</p>}
               </div>
-              <p className="gallery-counter" aria-label={`Fotografia ${active! + 1} de ${ITEMS.length}`}>
+              <p className={styles.galleryCounter} aria-label={`Fotografia ${active! + 1} de ${ITEMS.length}`}>
                 <span>{number(active! + 1)}</span><span aria-hidden="true"> / </span><span>{number(ITEMS.length)}</span>
               </p>
             </div>
-            <div className="gallery-filmstrip" ref={filmstrip} aria-label="Escolher fotografia">
+            <div className={styles.galleryFilmstrip} ref={filmstrip} aria-label="Escolher fotografia">
               {ITEMS.map((item, index) => (
                 <button
                   key={item.id}
                   type="button"
-                  className="gallery-thumbnail"
+                  className={styles.galleryThumbnail}
                   data-gallery-index={index}
                   aria-label={`Ver fotografia ${index + 1}: ${item.alt}`}
                   aria-current={index === active ? "true" : undefined}

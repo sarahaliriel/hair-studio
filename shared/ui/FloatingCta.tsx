@@ -3,11 +3,37 @@
 import { usePathname } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
 import { BookingLink } from "./BookingLink";
+import { syncFloatingCtaInert } from "./floating-cta-interactivity";
+import styles from "./FloatingCta.module.css";
 
 export function FloatingCTA() {
   const pathname = usePathname();
   const barRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const visibleRef = useRef(visible);
+
+  useLayoutEffect(() => {
+    const bar = barRef.current;
+    if (!bar) return;
+    const sync = () => syncFloatingCtaInert(bar, visibleRef.current);
+    const observer = new MutationObserver(sync);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    for (const selector of [".home-intro", ".page-transition"]) {
+      const overlay = document.querySelector(selector);
+      if (overlay) observer.observe(overlay, { attributes: true, attributeFilter: ["data-active"] });
+    }
+    document.addEventListener("arlete:page-visible", sync);
+    sync();
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("arlete:page-visible", sync);
+    };
+  }, [pathname]);
+
+  useLayoutEffect(() => {
+    visibleRef.current = visible;
+    if (barRef.current) syncFloatingCtaInert(barRef.current, visible);
+  }, [visible]);
 
   useLayoutEffect(() => {
     const bar = barRef.current;
@@ -68,7 +94,7 @@ export function FloatingCTA() {
   }, [pathname]);
 
   return (
-    <div ref={barRef} className="mobile-booking" data-visible={visible} inert={!visible}>
+    <div ref={barRef} className={`mobile-booking ${styles.floatingCta}`} data-visible={visible}>
       <BookingLink>Marcar pelo WhatsApp</BookingLink>
     </div>
   );

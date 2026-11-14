@@ -20,6 +20,13 @@ function load(file, globals = {}, dependencies = {}) {
   vm.runInNewContext(code, {
     module: compiled, exports: compiled.exports,
     require: (name) => {
+      if (/^\.\/[^/]+\.module\.css$/.test(name)) {
+        const css = fs.readFileSync(path.join(path.dirname(filename), name), "utf8");
+        const classes = Object.fromEntries(
+          [...css.matchAll(/\.([a-zA-Z_][\w-]*)/g)].map((match) => [match[1], match[1]]),
+        );
+        return { default: Object.freeze(classes) };
+      }
       assert.ok(name in dependencies, `unexpected dependency: ${name}`);
       return dependencies[name];
     }, ...globals,
@@ -27,6 +34,90 @@ function load(file, globals = {}, dependencies = {}) {
   return compiled.exports;
 }
 const policy = load("shared/ui/scroll-scene.ts");
+const { syncFloatingCtaInert } = load("shared/ui/floating-cta-interactivity.ts");
+const { hashTarget, alignHash } = load("shared/ui/page-transition/anchors.ts");
+
+test("anchor alignment decodes fragments and preserves CSS scroll offsets", () => {
+  const calls = [];
+  const target = { scrollIntoView: (options) => calls.push(options) };
+  const doc = { getElementById: (id) => id === "contato" ? target : null };
+  assert.equal(hashTarget("#contato", doc), target);
+  assert.equal(hashTarget("#%63ontato", doc), target);
+  assert.equal(alignHash("#contato", doc), true);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].behavior, "instant");
+  assert.equal(calls[0].block, "start");
+});
+
+test("missing or malformed anchors do not start a scroll", () => {
+  let calls = 0;
+  const doc = { getElementById: () => { calls++; return null; } };
+  for (const hash of ["", "#", "#inexistente", "#%E0%A4%A"]) {
+    assert.equal(alignHash(hash, doc), false);
+  }
+  assert.equal(calls, 1);
+});
+
+function floatingCtaState({ introPending = false, introActive = false, transitionActive = false } = {}) {
+  const state = { introPending, introActive, transitionActive };
+  const doc = {
+    activeElement: null,
+    documentElement: { classList: { contains: (name) => name === "intro-pending" && state.introPending } },
+    querySelector: (selector) => selector.includes(".home-intro")
+      ? (state.introActive ? {} : null)
+      : (state.transitionActive ? {} : null),
+  };
+  const bar = { inert: false, contains: (element) => element !== null && element === doc.activeElement && element === bar.focused };
+  return { state, doc, bar };
+}
+
+test("Floating CTA inert combines visibility, intro and page transition locks", () => {
+  for (const [visible, introPending, introActive, transitionActive, expected] of [
+    [false, true, false, false, true],
+    [true, true, false, false, true],
+    [false, false, false, false, true],
+    [true, false, false, false, false],
+    [true, false, true, false, true],
+    [false, false, true, false, true],
+    [true, false, false, true, true],
+    [false, false, false, true, true],
+    [true, false, true, true, true],
+  ]) {
+    const { state, doc, bar } = floatingCtaState({ introPending, introActive, transitionActive });
+    assert.equal(syncFloatingCtaInert(bar, visible, doc), expected);
+    assert.equal(bar.inert, expected, JSON.stringify({ visible, ...state }));
+  }
+});
+
+test("Floating CTA remains locked across route changes, reverse scroll and reduced motion", () => {
+  const { state, doc, bar } = floatingCtaState({ introActive: true });
+  assert.equal(syncFloatingCtaInert(bar, true, doc), true);
+  state.transitionActive = true;
+  state.introActive = false;
+  assert.equal(syncFloatingCtaInert(bar, true, doc), true, "route transition retains the lock");
+  state.transitionActive = false;
+  assert.equal(syncFloatingCtaInert(bar, true, doc), false, "destination without Hero is interactive");
+  state.transitionActive = true;
+  state.introPending = true;
+  assert.equal(syncFloatingCtaInert(bar, true, doc), true, "returning Home remains locked");
+  state.transitionActive = false;
+  state.introPending = false;
+  assert.equal(syncFloatingCtaInert(bar, false, doc), true, "Hero actions hide the bar");
+  assert.equal(syncFloatingCtaInert(bar, true, doc), false, "scrolling past Hero exposes the bar");
+  assert.equal(syncFloatingCtaInert(bar, false, doc), true, "reverse scroll hides it again");
+  assert.equal(syncFloatingCtaInert(bar, true, doc), false, "reduced motion with no intro lock can expose it");
+});
+
+test("Floating CTA releases focus before becoming inert", () => {
+  const { state, doc, bar } = floatingCtaState();
+  const focused = { blur() { doc.activeElement = null; } };
+  bar.focused = focused;
+  doc.activeElement = focused;
+  assert.equal(syncFloatingCtaInert(bar, true, doc), false);
+  state.transitionActive = true;
+  assert.equal(syncFloatingCtaInert(bar, true, doc), true);
+  assert.equal(doc.activeElement, null);
+});
 
 class Events {
   listeners = new Map();
@@ -591,8 +682,8 @@ test("reviews render real data without duplicate accessibility content or empty 
     } }));
     assert.ok(html.includes('id="avaliacoes"'));
     assert.ok(html.includes("A beleza está nos"));
-    assert.equal(html.includes("review-row-animated"), count >= 2);
-    assert.equal((html.match(/class="review-row(?: review-row-reverse)?(?: review-row-animated)?"/g) ?? []).length, count >= 4 ? 2 : 1);
+    assert.equal(html.includes("reviewRowAnimated"), count >= 2);
+    assert.equal((html.match(/class="reviewRow(?: reviewRowReverse)?(?: reviewRowAnimated)?"/g) ?? []).length, count >= 4 ? 2 : 1);
     assert.ok(html.includes("https://maps.google.com/example"));
     for (const review of reviews) assert.ok(html.includes(review.text));
     if (count >= 2) assert.ok(html.includes('aria-hidden="true"'));

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import type { ReviewsPayload } from "../data/google-reviews";
+import styles from "./ReviewsSection.module.css";
 
 type Testimonial = {
   id: string;
@@ -12,15 +13,15 @@ type Testimonial = {
 
 function ReviewCard({ review }: { review: Testimonial }) {
   return (
-    <article className="review-card" tabIndex={0}>
+    <article className={`review-card ${styles.reviewCard}`} tabIndex={0}>
       {review.rating !== undefined && review.rating > 0 && (
-        <span className="review-stars" aria-label={`${review.rating} de 5 estrelas`}>
+        <span className={styles.reviewStars} aria-label={`${review.rating} de 5 estrelas`}>
           {"★".repeat(Math.min(5, Math.max(0, Math.round(review.rating))))}
         </span>
       )}
       <blockquote>“{review.review}”</blockquote>
-      <p className="review-author">{review.name}</p>
-      {review.source && <p className="review-source">{review.source}</p>}
+      <p className={styles.reviewAuthor}>{review.name}</p>
+      {review.source && <p className={styles.reviewSource}>{review.source}</p>}
     </article>
   );
 }
@@ -29,12 +30,12 @@ function ReviewRow({ reviews, reverse = false, animated }: { reviews: Testimonia
   if (!reviews.length) return null;
   const repeats = animated ? Math.ceil(6 / reviews.length) : 1;
   return (
-    <div className={`review-row${reverse ? " review-row-reverse" : ""}${animated ? " review-row-animated" : ""}`} tabIndex={0} aria-label={reverse ? "Avaliações, segunda fila" : "Avaliações, primeira fila"}>
-      <div className="review-track">
+    <div className={`${styles.reviewRow}${reverse ? ` ${styles.reviewRowReverse}` : ""}${animated ? ` ${styles.reviewRowAnimated}` : ""}`} tabIndex={0} aria-label={reverse ? "Avaliações, segunda fila" : "Avaliações, primeira fila"}>
+      <div className={styles.reviewTrack}>
         {[0, ...(animated ? [1] : [])].map((group) => (
-          <div className="review-group" key={group} aria-hidden={group === 1 ? true : undefined}>
+          <div className={styles.reviewGroup} key={group} aria-hidden={group === 1 ? true : undefined}>
             {Array.from({ length: repeats }, (_, repeat) => reviews.map((review) => (
-              <div className="review-item" key={`${group}-${repeat}-${review.id}`} aria-hidden={repeat > 0 ? true : undefined}>
+              <div className={styles.reviewItem} key={`${group}-${repeat}-${review.id}`} aria-hidden={repeat > 0 ? true : undefined}>
                 <ReviewCard review={review} />
               </div>
             )))}
@@ -66,17 +67,17 @@ export default function ReviewsSection({ data }: { data: ReviewsPayload }) {
   const animated = reviews.length >= 2;
 
   return (
-    <section className="review-section" id="avaliacoes" aria-labelledby="reviews-title">
-      <div className="review-heading">
+    <section className={styles.reviewSection} id="avaliacoes" aria-labelledby="reviews-title">
+      <div className={styles.reviewHeading}>
         <h2 id="reviews-title">A beleza está nos <em>detalhes.</em></h2>
         <p>E nas histórias de quem passa por aqui.</p>
       </div>
-      <div className={`review-rows${animated ? "" : " review-rows-static"}`}>
+      <div className={`${styles.reviewRows}${animated ? "" : ` ${styles.reviewRowsStatic}`}`}>
         <ReviewRow reviews={firstRow} animated={animated} />
         {twoRows && <ReviewRow reviews={secondRow} reverse animated={animated} />}
       </div>
       {data.place?.googleMapsUri && (
-        <div className="review-cta">
+        <div className={styles.reviewCta}>
           <Button variant="inverse" render={<a href={data.place.googleMapsUri} target="_blank" rel="noopener noreferrer" />}>
             Ver todas as avaliações
           </Button>

@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { site } from "@/config/Site";
 import { bookingHref } from "./BookingLink";
+import styles from "./CTAButtons.module.css";
 export function CTAButtons() {
   function track(event: string, label: string) {
     window.gtag?.("event", event, {
@@ -10,7 +11,7 @@ export function CTAButtons() {
     });
   }
   return (
-    <div className="contact-actions" data-reveal="cta">
+    <div className={styles.contactActions} data-reveal="cta">
       <Button render={<a
         href={bookingHref}
         target="_blank"

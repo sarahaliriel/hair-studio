@@ -8,6 +8,7 @@ import {
   type ServiceCategoryKey,
 } from "@/features/services/data/ServicesMenu";
 import { site } from "@/config/Site";
+import styles from "./ServicesMenu.module.css";
 
 function normalize(s: string) {
   return s
@@ -60,7 +61,7 @@ export function ServicesMenu({ initialCategory }: { initialCategory?: string }) 
         </div>
 
         <div className="mt-3 px-1">
-          <div className="service-search flex items-center gap-2 rounded-full border border-black/10 bg-[#edeae2]/60 px-4 py-3">
+          <div className={`${styles.serviceSearch} flex items-center gap-2 rounded-full border border-black/10 bg-[#edeae2]/60 px-4 py-3`}>
             <span className="text-black/45">⌕</span>
             <input
               value={q}
